@@ -3,6 +3,7 @@ import cors from "cors";
 import conexion from "./src/models/bd_conexion/bd_conexion.js";
 // Importa la conexión a la BD
 import usuarioRuta from "./src/routes/user.js";
+import rolesRuta from "./src/routes/roles.js";
 
 const app = express();
 
@@ -16,7 +17,7 @@ conexion();
 
 // Rutas globales de la aplicación
 app.use("/api", usuarioRuta);
-app.use("/api", usuarioRuta);
+app.use("/api", rolesRuta);
 
 // Iniciar servidor
 const PORT = 4000;

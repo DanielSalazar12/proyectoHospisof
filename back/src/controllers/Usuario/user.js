@@ -96,4 +96,31 @@ const actualizarPorId = async (req, res) => {
   }
 };
 
-export default { listarTodos, nuevo, buscarPorId, actualizarPorId };
+const eliminarPorId = async (req, res) => {
+  let id = req.params.id;
+
+  try {
+    //Logica de buscar  mostrar el resultado
+    //let consulta = await producto.find(id).exec();
+    let consulta = await Usuarios.findOneAndDelete({ _id: id }).exec();
+
+    return res.send({
+      estado: true,
+      mensaje: `Eliminacion exitosa`,
+      consulta: consulta,
+    });
+  } catch (error) {
+    return res.send({
+      estado: false,
+      mensaje: `Error, no se pudo realizar la consulta`,
+    });
+  }
+};
+
+export default {
+  listarTodos,
+  nuevo,
+  buscarPorId,
+  actualizarPorId,
+  eliminarPorId,
+};
