@@ -1,1 +1,0 @@
-// ruta del pasiente
