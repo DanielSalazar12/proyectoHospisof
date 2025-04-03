@@ -3,7 +3,7 @@ import config from "../config/database.js";
 
 export const cnx = async () => {
   try {
-    await mongoose.connect(config.url, config.options);
+    await mongoose.connect(config.url);
     console.log("Conexion exitosa");
   } catch {
     console.error(`Hubo un error en la conexion a MongoDB: ${error.message}  `);

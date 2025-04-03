@@ -9,6 +9,10 @@ const medicalSchema = new Schema(
       type: String,
       required: true,
     },
+    telefonoMedico: {
+      type: Number,
+      required: true,
+    },
     especialidadMedico: {
       type: String,
       required: true,

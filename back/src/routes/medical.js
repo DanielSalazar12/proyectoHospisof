@@ -1,6 +1,11 @@
 import express, { json } from "express";
 const router = express.Router();
-import { getAll, add, updateMedical } from "../controllers/Medico/medical.js";
+import {
+  getAll,
+  add,
+  updateMedical,
+  searchById,
+} from "../controllers/Medico/medical.js";
 import { celebrate, Joi, errors, Segments } from "celebrate";
 
 router.get("/medical/list", async (req, res) => {
@@ -9,25 +14,28 @@ router.get("/medical/list", async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Error al obtener la lista de médicos" });
   }
 });
 
-router.get("/medical/id:", async (req, res) => {
+router.get("/medical/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const response = await searchById(id);
     res.status(200).json(response);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Error al obtener " });
   }
 });
 
 router.post(
   "/medical/create",
-  Joi.celebrate({
+  celebrate({
     body: Joi.object({
       nombreMedico: Joi.string().required(),
       emailMedico: Joi.string().required(),
+      telefonoMedico: Joi.number().required(),
       especialidadMedico: Joi.string().required(),
     }),
   }),
@@ -38,16 +46,18 @@ router.post(
       res.status(200).json(response);
     } catch (error) {
       console.log(error);
+      res.status(500).json({ message: "Error al Registrar el medico" });
     }
   }
 );
 router.post(
   "/medical/update",
-  Joi.celebrate({
+  celebrate({
     body: Joi.object({
       id: Joi.string().required(),
       nombreMedico: Joi.string().required(),
       emailMedico: Joi.string().required(),
+      telefonoMedico: Joi.number().required(),
       especialidadMedico: Joi.string().required(),
     }),
   }),
@@ -58,6 +68,7 @@ router.post(
       res.status(200).json(response);
     } catch (error) {
       console.log(error);
+      res.status(500).json({ message: "Error al actualizar" });
     }
   }
 );

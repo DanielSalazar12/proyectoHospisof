@@ -3,18 +3,9 @@ import Medicals from "../../models/Medico/medical.js";
 
 export const getAll = async (req, res) => {
   try {
-    let listaUsuarios = await find().exec();
-    res.status(200).send({
-      Exito: true,
-      data: listaUsuarios,
-      mensaje: "Exito en la consulta",
-    });
-  } catch (error) {
-    res.status(500).send({
-      Exito: false,
-      mensaje: "Error, en la consulta.",
-    });
-  }
+    let listaMedicos = await Medicals.find().exec();
+    return listaMedicos;
+  } catch (error) {}
 };
 
 export const add = async (req, res) => {
@@ -30,7 +21,7 @@ export const add = async (req, res) => {
     pais: req.body.pais,
   };
 
-  const usuarioExiste = await findOne({ email: data.email });
+  const usuarioExiste = await Medicals.findOne({ email: data.email });
 
   if (usuarioExiste) {
     return res.send({
@@ -79,11 +70,10 @@ export const updateMedical = async (req, res) => {
     });
   }
 };
-const searchById = async (req, res) => {
+export const searchById = async (req, res) => {
   let id = req.params.id;
-
   try {
-    let result = await findById(id).exec();
+    let result = await Medicals.findById(id).exec();
     return res.send({
       estado: true,
       mensaje: "Consulta Exitosa",
@@ -99,7 +89,7 @@ const searchById = async (req, res) => {
 export const deleteById = async (req, res) => {
   let id = req.params.id;
   try {
-    let result = await findOneAndDelete(id).exec();
+    let result = await Medicals.findOneAndDelete(id).exec();
     return res.send({
       estado: true,
       mensaje: "Borrado Exitoso",
@@ -155,4 +145,3 @@ export const deleteById = async (req, res) => {
     });
   }
 }; */
-
