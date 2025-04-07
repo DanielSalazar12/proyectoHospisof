@@ -23,7 +23,11 @@ const listarTodos = async (req, res) => {
 const nuevo = async (req, res) => {
   let datos = {
     nombre: req.body.nombre,
+    apellido: req.body.apellido,
     email: req.body.email,
+    telefono: req.body.telefono,
+    especialidad: req.body.especialidad,
+    rol: req.body.rol,
     userName: req.body.userName,
     passwordUser: req.body.passwordUser,
   };
@@ -75,7 +79,11 @@ const actualizarPorId = async (req, res) => {
 
   let datos = {
     nombre: req.body.nombre,
+    apellido: req.body.apellido,
     email: req.body.email,
+    telefono: req.body.telefono,
+    especialidad: req.body.especialidad,
+    rol: req.body.rol,
     userName: req.body.userName,
     passwordUser: req.body.passwordUser,
   };
