@@ -1,7 +1,9 @@
-import Patients from "../../models/Paciente/patient.js";
+// controlador medico
+import Medicamentos from "../../models/Medicamentos/medicamentos.js";
+
 export const getAll = async () => {
   try {
-    let listaMedicos = await Patients.find().exec();
+    let listaMedicos = await Medicamentos.find().exec();
     return {
       estado: true,
       data: listaMedicos,
@@ -15,28 +17,37 @@ export const getAll = async () => {
 };
 
 export const add = async (data) => {
-  const patientExist = await Patients.findOne({ documento: data.documento });
-  if (patientExist) {
+  const medicalExist = await Medicamentos.findOne({
+    codigo: data.codigo,
+  });
+  if (medicalExist) {
     return {
       estado: false,
-      mensaje: "El Paciente ya existe en el sistema",
+      mensaje: "El Medicamento ya existe en el sistema",
     };
   }
 
   try {
-    const patientNuevo = new Patients({
-      nombrePaciente: data.nombre,
-      documento: data.documento,
-      emailPaciente: data.email,
-      telefonoPaciente: data.telefono,
-      fechaNacimiento: data.fecha,
-      epsPaciente: data.eps,
+    const medicalNuevo = new Medicamentos({
+      nombre: data.nombre,
+      codigo: data.codigo,
+      presentacion: data.presentacion,
+      descripcion: data.descripcion,
+      concentracion: data.concentracion,
+      formaFarmaceutica: data.formaFarma,
+      viaAdminist: data.administracion,
+      uniEnvase: data.envase,
+      uniMedida: data.medida,
+      stockDisponible: data.stock,
+      fechaVencimiento: data.vencimiento,
+      precioCompra: data.prCompra,
+      precioVenta: data.prVenta,
       status: 1,
     });
-    await patientNuevo.save();
+    await medicalNuevo.save();
     return {
       estado: true,
-      mensaje: "Paciente Registrado exitosamente",
+      mensaje: "Medicamento Registrado exitosamente",
     };
   } catch (error) {
     return {
@@ -45,22 +56,29 @@ export const add = async (data) => {
     };
   }
 };
-export const updatePatient = async (data) => {
+export const updateMedical = async (data) => {
   let id = data.id;
   let info = {
-    nombrePaciente: data.nombre,
-    documento: data.documento,
-    emailPaciente: data.email,
-    telefonoPaciente: data.telefono,
-    fechaNacimiento: data.fecha,
-    epsPaciente: data.eps,
+    nombre: data.nombre,
+    codigo: data.codigo,
+    presentacion: data.presentacion,
+    descripcion: data.descripcion,
+    concentracion: data.concentracion,
+    formaFarmaceutica: data.formaFarma,
+    viaAdminist: data.administracion,
+    uniEnvase: data.envase,
+    uniMedida: data.medida,
+    stockDisponible: data.stock,
+    fechaVencimiento: data.vencimiento,
+    precioCompra: data.prCompra,
+    precioVenta: data.prVenta,
   };
   try {
-    let patientUpdate = await Patients.findByIdAndUpdate(id, info);
+    let medicalUpdate = await Medicamentos.findByIdAndUpdate(id, info);
     return {
       estado: true,
       mensaje: "Actualizacion Exitosa!",
-      result: patientUpdate,
+      result: medicalUpdate,
     };
   } catch (error) {
     return {
@@ -72,7 +90,7 @@ export const updatePatient = async (data) => {
 export const searchById = async (data) => {
   let id = data.id;
   try {
-    let result = await Patients.findById(id).exec();
+    let result = await Medicamentos.findById(id).exec();
     return {
       estado: true,
       mensaje: "Consulta Exitosa",
@@ -88,7 +106,7 @@ export const searchById = async (data) => {
 export const deleteById = async (data) => {
   let id = data.id;
   try {
-    let result = await Patients.findByIdAndUpdate(id, { status: 0 });
+    let result = await Medicamentos.findByIdAndUpdate(id, { status: 0 });
     return {
       estado: true,
       result: result,
@@ -140,24 +158,4 @@ export const subirImagen = async (req, res) => {
       error: error.message,
     });
   }
-};
-export const avatar = (req, res) => {
-  // Sacar el parametro de la url
-  const file = req.params.file;
-
-  // Montar el path real de la imagen
-  const filePath = "./uploads/usuarios/" + file;
-
-  // Comprobar que existe
-  stat(filePath, (error, exists) => {
-    if (!exists) {
-      return res.status(404).send({
-        status: "error",
-        message: "No existe la imagen",
-      });
-    }
-
-    // Devolver un file
-    return res.sendFile(resolve(filePath));
-  });
 };
