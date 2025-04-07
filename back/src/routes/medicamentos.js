@@ -1,5 +1,5 @@
 import express, { json } from "express";
-
+import multer from "multer";
 const router = express.Router();
 import {
   getAll,
@@ -11,22 +11,38 @@ import {
 
 import { celebrate, Joi, errors, Segments } from "celebrate";
 
+// configurar un bodega para las imagenes de multer
+const storage = multer.diskStorage({
+  // ruta de destino para almacenar los archivos
+  destination: (req, file, cb) => {
+    cb(null, "./uploads/usuarios/");
+  },
+  // estructara para determinar los archivos
+  filename: (req, file, cb) => {
+    // armamos el nombre del archivo
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const uploads = multer({ storage });
 router.get("/medicamentos/list", async (req, res) => {
   try {
     const response = await getAll();
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener la lista de medicamentos" });
+    res
+      .status(500)
+      .json({ message: "Error al obtener la lista de medicamentos" });
   }
 });
-/* router.get("/medicamentos/img", async (req, res) => {
+router.get("/medicamentos/:file", async (req, res) => {
   try {
+    const { body: data } = req;
     const response = await avatar();
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la lista de médicos" });
   }
-}); */
+});
 router.get("/medicamentos/:id", async (req, res) => {
   try {
     const data = req.params.id;
@@ -36,9 +52,9 @@ router.get("/medicamentos/:id", async (req, res) => {
     res.status(500).json({ message: "Error al obtener la informacion" });
   }
 });
-
 router.post(
   "/medicamentos/create",
+  uploads.single("img"),
   celebrate({
     body: Joi.object({
       nombre: Joi.string().required(),
@@ -58,8 +74,8 @@ router.post(
   }),
   async (req, res) => {
     try {
-      const { body: data } = req; // obtenemos los datos del body
-      const response = await add(data);
+      const { body: data } = req; 
+      const response = await add(data, req.file);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Error al Registrar el Medicamento" });
@@ -96,7 +112,6 @@ router.post(
     }
   }
 );
-
 router.post(
   "/medicamentos/delet",
   celebrate({
@@ -114,5 +129,4 @@ router.post(
     }
   }
 );
-
 export default router;

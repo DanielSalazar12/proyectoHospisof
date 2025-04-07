@@ -60,6 +60,12 @@ const medicamentosSchema = new Schema(
       type: Number,
       required: true,
     },
+    imgen: {
+      // (tabletas, frascos, ampollas)
+      type: String,
+      default: "",
+    },
+
     status: {
       type: Number,
       required: true,
