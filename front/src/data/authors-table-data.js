@@ -1,3 +1,5 @@
+
+
 export const authorsTableData = [
   {
     img: "/img/team-2.jpeg",
@@ -50,3 +52,5 @@ export const authorsTableData = [
 ];
 
 export default authorsTableData;
+
+
