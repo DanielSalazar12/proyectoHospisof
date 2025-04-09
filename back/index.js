@@ -15,6 +15,7 @@ app.use("/api", medicamentos);
 app.use("/api", patient);
 app.use("/api", usuarioRuta);
 app.use("/api", rolesRuta);
+
 const initServe = async () => {
   await cnx();
   app.use(cors);

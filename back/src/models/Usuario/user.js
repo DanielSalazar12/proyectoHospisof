@@ -1,8 +1,12 @@
 
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 const usuarioSchema = new Schema(
   {
     nombre: {
+      type: String,
+      required: true,
+    },
+    apellido: {
       type: String,
       required: true,
     },
@@ -10,7 +14,23 @@ const usuarioSchema = new Schema(
       type: String,
       required: true,
     },
-    passwordHash: {
+    telefono: {
+      type: String,
+      required: true,
+    },
+    especialidad: {
+      type: String,
+    },
+    rol: {
+      type: Types.ObjectId, // Esto es para la foranea de roles
+      ref: "Roles",
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
+    },
+    passwordUser: {
       type: String,
       required: true,
     },
