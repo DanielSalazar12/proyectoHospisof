@@ -6,7 +6,7 @@ import {
   add,
   updateMedical,
   searchById,
-  deleteById,
+  deleteById
 } from "../controllers/Medicamentos/medicamentos.js";
 
 import { celebrate, Joi, errors, Segments } from "celebrate";
@@ -21,23 +21,38 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     // armamos el nombre del archivo
     cb(null, Date.now() + "-" + file.originalname);
-  },
+  }
 });
+
+const schema = Joi.object({
+  nombre: Joi.string().required(),
+  codigo: Joi.string().required(),
+  presentacion: Joi.string().required(),
+  descripcion: Joi.string().required(),
+  concentracion: Joi.string().required(),
+  formaFarma: Joi.string().required(),
+  administracion: Joi.string().required(),
+  envase: Joi.string().required(),
+  medida: Joi.string().required(),
+  stock: Joi.number().required(),
+  vencimiento: Joi.string().required(),
+  prCompra: Joi.number().required(),
+  prVenta: Joi.number().required()
+});
+
 const uploads = multer({ storage });
 router.get("/medicamentos/list", async (req, res) => {
   try {
     const response = await getAll();
     res.status(200).json(response);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error al obtener la lista de medicamentos" });
+    res.status(500).json({ message: "Error al obtener la lista de medicamentos" });
   }
 });
 router.get("/medicamentos/:file", async (req, res) => {
   try {
     const { body: data } = req;
-    const response = await avatar();
+    const response = await avatar(data);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la lista de médicos" });
@@ -56,25 +71,11 @@ router.post(
   "/medicamentos/create",
   uploads.single("img"),
   celebrate({
-    body: Joi.object({
-      nombre: Joi.string().required(),
-      codigo: Joi.string().required(),
-      presentacion: Joi.string().required(),
-      descripcion: Joi.string().required(),
-      concentracion: Joi.string().required(),
-      formaFarma: Joi.string().required(),
-      administracion: Joi.string().required(),
-      envase: Joi.string().required(),
-      medida: Joi.string().required(),
-      stock: Joi.number().required(),
-      vencimiento: Joi.date().required(),
-      prCompra: Joi.number().required(),
-      prVenta: Joi.number().required(),
-    }),
+    body: schema
   }),
   async (req, res) => {
     try {
-      const { body: data } = req; 
+      const { body: data } = req;
       const response = await add(data, req.file);
       res.status(200).json(response);
     } catch (error) {
@@ -85,22 +86,7 @@ router.post(
 router.post(
   "/medicamentos/update",
   celebrate({
-    body: Joi.object({
-      id: Joi.string().required(),
-      nombre: Joi.string().required(),
-      codigo: Joi.string().required(),
-      presentacion: Joi.string().required(),
-      descripcion: Joi.string().required(),
-      concentracion: Joi.string().required(),
-      formaFarma: Joi.string().required(),
-      administracion: Joi.string().required(),
-      envase: Joi.string().required(),
-      medida: Joi.string().required(),
-      stock: Joi.number().required(),
-      vencimiento: Joi.date().required(),
-      prCompra: Joi.number().required(),
-      prVenta: Joi.number().required(),
-    }),
+    body: schema
   }),
   async (req, res) => {
     try {
@@ -116,8 +102,8 @@ router.post(
   "/medicamentos/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required(),
-    }),
+      id: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {
@@ -129,4 +115,6 @@ router.post(
     }
   }
 );
+
+router.use(errors());
 export default router;

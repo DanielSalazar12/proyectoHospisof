@@ -8,11 +8,7 @@ import roles from "./src/routes/roles.js";
 
 const app = express();
 app.use(express.json());
-app.use(
-  cors({
-    origin: "http://localhost:5173"
-  })
-);
+app.use(cors());
 // rutas
 app.use("/api", medicamentos);
 app.use("/api", patient);
@@ -21,7 +17,7 @@ app.use("/api", roles);
 
 const initServe = async () => {
   await cnx();
- 
+
   const puerto = process.env.PORT || 3000;
   app.listen(puerto, () => {
     console.log(`Servidor escuchando en el puerto ${puerto}`);

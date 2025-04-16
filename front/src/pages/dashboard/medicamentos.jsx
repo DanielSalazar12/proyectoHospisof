@@ -6,16 +6,79 @@ import {
   Tooltip,
   CardFooter,
   IconButton,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+  Stepper,
+  Step,
 } from "@material-tailwind/react";
 
 import { useMedicamentosData } from "@/hooks/useMedicamentosData";
-import ModalForm from "@/components/modalForm";
+import FormMedicamento from "@/components/FormMedicamento";
+import { useState } from "react";
+import {
+  ArchiveBoxIcon,
+  ClipboardIcon,
+  PhoneIcon,
+} from "@heroicons/react/24/solid";
 
 export function Medicamentos() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [isLastStep, setIsLastStep] = useState(false);
+  const [isFirstStep, setIsFirstStep] = useState(false);
+
+  const handleNext = () => !isLastStep && setActiveStep((cur) => cur + 1);
+  const handlePrev = () => !isFirstStep && setActiveStep((cur) => cur - 1);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(!open);
   const medicamentosList = useMedicamentosData();
   return (
     <>
-      <ModalForm />
+      <Button onClick={handleOpen} className="mb-5" color="green">
+        <i className="fa-solid fa-plus"></i> Agregar Medicamento
+      </Button>
+
+      <Dialog open={open} size="lg" handler={handleOpen}>
+        <DialogHeader>Registro Medicamento</DialogHeader>
+        <DialogBody>
+          <Stepper
+            activeStep={activeStep}
+            className="w-full mb-5"
+            isFirstStep={(value) => setIsFirstStep(value)}
+            isLastStep={(value) => setIsLastStep(value)}
+          >
+            <Step onClick={() => setActiveStep(0)}>
+              {" "}
+              <ClipboardIcon className="h-5 w-5 text-blue-gray" />{" "}
+            </Step>
+            <Step onClick={() => setActiveStep(1)}>
+              <ArchiveBoxIcon className="h-5 w-5 text-blue-gray" />{" "}
+            </Step>
+            <Step onClick={() => setActiveStep(2)}>
+              <PhoneIcon className="h-5 w-5 text-blue-gray" />{" "}
+            </Step>
+          </Stepper>
+          <FormMedicamento activeStep={activeStep} />
+        </DialogBody>
+        <DialogFooter className="mt-10 flex justify-between">
+          <Button onClick={handlePrev} disabled={isFirstStep}>
+            Prev
+          </Button>
+          {activeStep === 2 ? (
+            <Button variant="gradient" className="mr-1">
+              Finalizar
+            </Button>
+          ) : (
+            <Button variant="gradient" className="mr-1" onClick={handleNext}>
+              Siguiente
+            </Button>
+          )}
+        </DialogFooter>
+      </Dialog>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-10">
         {medicamentosList.map((medicamento) => (
           <Card className="w-96 shadow-lg" key={medicamento.codigo}>
