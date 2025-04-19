@@ -5,13 +5,13 @@ import {
   Typography,
   Textarea,
   Button,
+  Card,
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
-import ImagePreview from "./ImagenPreview";
 import { useFormMedicamento } from "@/hooks/useFormMedicamento";
 
 const FormMedicamento = ({ activeStep }) => {
-  const [frmData, setFormData] = useState({
+  const [formulario, setFormData] = useState({
     nombre: "",
     administracion: "",
     img: "",
@@ -43,45 +43,58 @@ const FormMedicamento = ({ activeStep }) => {
       [name]: value,
     }));
   };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    formulario.img = file;
+    console.log("Imagen seleccionada:", file);
+    if (!file) return;
 
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImagen(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+  };
   const generarCodigo = () => {
-    return `${frmData.nombre
+    return `${formulario.nombre
       .substring(0, 3)
-      .toUpperCase()}${frmData.concentracion.substring(
+      .toUpperCase()}${formulario.concentracion.substring(
       0,
       2,
-    )}-${frmData.formaFarma.substring(0, 3).toUpperCase()}`;
+    )}-${formulario.formaFarma.substring(0, 3).toUpperCase()}`;
   };
 
   const { medicamento } = useFormMedicamento(medicamentoCreado);
 
   useEffect(() => {
     if (medicamento) {
-      console.log("Medicamento creado:", medicamento);
+      console.log("Actualizando:", medicamento);
+      setFormData({});
+      setImagen(null);
     }
   }, [medicamento]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = {
-      nombre: frmData.nombre,
-      codigo: generarCodigo(),
-      presentacion: frmData.presentacion,
-      descripcion: frmData.descripcion,
-      concentracion: frmData.concentracion,
-      formaFarma: frmData.formaFarma,
-      administracion: frmData.administracion,
-      envase: frmData.envase,
-      medida: frmData.medida,
-      stock: parseInt(frmData.stock, 10),
-      vencimiento: frmData.vencimiento,
-      prCompra: parseFloat(frmData.prCompra),
-      prVenta: parseFloat(frmData.prVenta),
-      img: imagen,
-    };
-
-    setMedicamentoCreado(data);
+    const formData = new FormData();
+    formData.append("nombre", formulario.nombre);
+    formData.append("codigo", generarCodigo());
+    formData.append("presentacion", formulario.presentacion);
+    formData.append("descripcion", formulario.descripcion);
+    formData.append("concentracion", formulario.concentracion);
+    formData.append("formaFarma", formulario.formaFarma);
+    formData.append("administracion", formulario.administracion);
+    formData.append("envase", formulario.envase);
+    formData.append("medida", formulario.medida);
+    formData.append("stock", formulario.stock);
+    formData.append("vencimiento", formulario.vencimiento);
+    formData.append("prCompra", formulario.prCompra);
+    formData.append("prVenta", formulario.prVenta);
+    formData.append("img", formulario.img);
+    setMedicamentoCreado(formData);
     console.log("Formulario enviado");
   };
 
@@ -99,11 +112,12 @@ const FormMedicamento = ({ activeStep }) => {
                 Nombre
               </Typography>
               <Input
+                required={true}
                 color="gray"
                 size="lg"
                 placeholder="eg. Paracetamol"
                 name="nombre"
-                value={frmData.nombre}
+                value={formulario.nombre}
                 onChange={handleChange}
                 className="placeholder:opacity-100 focus:!border-t-gray-900"
                 containerProps={{
@@ -126,7 +140,7 @@ const FormMedicamento = ({ activeStep }) => {
                 <Select
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="administracion"
-                  value={frmData.administracion}
+                  value={formulario.administracion}
                   onChange={(option) =>
                     handleSelectChange("administracion", option)
                   }
@@ -162,7 +176,7 @@ const FormMedicamento = ({ activeStep }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-gray"
                   placeholder="1"
                   name="presentacion"
-                  value={frmData.presentacion}
+                  value={formulario.presentacion}
                   onChange={(option) =>
                     handleSelectChange("presentacion", option)
                   }
@@ -201,7 +215,7 @@ const FormMedicamento = ({ activeStep }) => {
 
                 <Select
                   name="medida"
-                  value={frmData.medida}
+                  value={formulario.medida}
                   onChange={(option) => handleSelectChange("medida", option)}
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 bg-white text-gray-800 focus:!border-primary"
                 >
@@ -241,7 +255,7 @@ const FormMedicamento = ({ activeStep }) => {
                 <Select
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="formaFarma"
-                  value={frmData.formaFarma}
+                  value={formulario.formaFarma}
                   onChange={(option) =>
                     handleSelectChange("formaFarma", option)
                   }
@@ -288,7 +302,7 @@ const FormMedicamento = ({ activeStep }) => {
                   placeholder="eg. Tablestas | Capsulas"
                   name="descripcion"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
-                  value={frmData.descripcion}
+                  value={formulario.descripcion}
                   onChange={handleChange}
                   containerProps={{
                     className: "!min-w-full",
@@ -318,7 +332,7 @@ const FormMedicamento = ({ activeStep }) => {
                   placeholder="eg. <8.8oz | 250g"
                   name="concentracion"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
-                  value={frmData.concentracion}
+                  value={formulario.concentracion}
                   onChange={handleChange}
                 />
               </div>
@@ -334,7 +348,7 @@ const FormMedicamento = ({ activeStep }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-dark-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   placeholder="1"
                   name="envase"
-                  value={frmData.envase}
+                  value={formulario.envase}
                   onChange={(option) => handleSelectChange("envase", option)}
                 >
                   <Option value="caja">Caja</Option>
@@ -369,7 +383,7 @@ const FormMedicamento = ({ activeStep }) => {
                   placeholder="$0.00"
                   icon={<i className="fa-solid fa-dollar-sign text-gray-500" />}
                   name="prCompra"
-                  value={frmData.prCompra}
+                  value={formulario.prCompra}
                   onChange={handleChange}
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
@@ -388,7 +402,7 @@ const FormMedicamento = ({ activeStep }) => {
                   placeholder="$0.00"
                   icon={<i className="fa-solid fa-dollar-sign text-gray-500" />}
                   name="prVenta"
-                  value={frmData.prVenta}
+                  value={formulario.prVenta}
                   onChange={handleChange}
                   type="number"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -410,7 +424,7 @@ const FormMedicamento = ({ activeStep }) => {
                   type="number"
                   placeholder="eg. 12 | 24 | 30"
                   name="stock"
-                  value={frmData.stock}
+                  value={formulario.stock}
                   onChange={handleChange}
                   icon={<i className="fa-solid fa-box text-gray-500" />}
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -430,7 +444,7 @@ const FormMedicamento = ({ activeStep }) => {
                   size="lg"
                   placeholder="$0.00"
                   name="vencimiento"
-                  value={frmData.vencimiento}
+                  value={formulario.vencimiento}
                   onChange={handleChange}
                   type="date"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -442,7 +456,108 @@ const FormMedicamento = ({ activeStep }) => {
         {activeStep === 2 && (
           <>
             <div className="flex gap-4 mt-4">
-              <ImagePreview imagen={imagen} setImagen={setImagen} />
+              <div className="w-full">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="mb-2 text-left font-medium"
+                >
+                  Imagen
+                </Typography>
+                <Input
+                  type="file"
+                  name="img"
+                  accept="image/.png, image/jpeg, image/jpg"
+                  className="placeholder:opacity-100 focus:!border-t-gray-900  "
+                  icon={<i className="fa-solid fa-image text-gray-500" />}
+                  onChange={handleImageChange}
+                />
+              </div>
+            </div>
+            <div className="flex gap-4 mt-4">
+              <div className="w-full">
+                {imagen && (
+                  <>
+                    <div className="w-full">
+                      {" "}
+                      <Card
+                        shadow={false}
+                        className="flex flex-row w-full max-w-4xl h-64 overflow-hidden rounded-lg bg-white shadow-md"
+                      >
+                        <div
+                          className="w-1/2 h-full bg-cover bg-center transition-all duration-500 ease-in-out"
+                          style={{
+                            backgroundImage: `url(${imagen})`,
+                          }}
+                        >
+                          <div className="h-full w-full bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+                        </div>
+                        <div className="w-1/2 p-4 flex flex-col justify-between">
+                          <div>
+                            <Typography
+                              variant="h6"
+                              className="text-lg font-bold text-blue-800"
+                            >
+                              {formulario.nombre}
+                            </Typography>
+                            <Typography className="text-sm">
+                              <span className="font-semibold">Código:</span>{" "}
+                              {generarCodigo()}
+                            </Typography>
+                          </div>
+                          <div className="border-t pt-2">
+                            <Typography className="text-sm">
+                              <span className="font-semibold">
+                                <i class="fa-solid fa-syringe"></i>{" "}
+                                Administración:
+                              </span>{" "}
+                              {formulario.administracion}
+                            </Typography>
+                            <Typography className="text-sm">
+                              <span className="font-semibold">
+                                <i class="fa-solid fa-prescription-bottle"></i>{" "}
+                                Presentación:
+                              </span>{" "}
+                              {formulario.presentacion}
+                            </Typography>
+                            <Typography className="text-sm">
+                              <span className="font-semibold">
+                                <i class="fa-solid fa-clipboard"></i>{" "}
+                                Descripción:
+                              </span>{" "}
+                              {formulario.descripcion}
+                            </Typography>
+                          </div>
+                          <div className="border-t pt-2">
+                            <Typography className="text-sm">
+                              <span className="font-semibold">
+                                <i class="fa-solid fa-calendar-days"></i>{" "}
+                                Vencimiento:
+                              </span>{" "}
+                              {formulario.vencimiento}
+                            </Typography>
+                            <Typography className="text-sm">
+                              <span className="font-semibold">
+                                <i class="fa-solid fa-box-archive"></i> Stock:
+                              </span>{" "}
+                              <span
+                                className={`font-bold px-2 py-1 rounded ${
+                                  formulario.stock < 10
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-green-100 text-green-700"
+                                }`}
+                              >
+                                {formulario.stock }
+                              </span>
+                            </Typography>
+                          </div>
+                        </div>
+                        {/* Información adicional */}
+                      </Card>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             <div className="flex gap-4 mt-4">
               <div className="w-full">

@@ -12,8 +12,20 @@ export const useFormMedicamento = (data = null) => {
         data: data,
       })
         .then((response) => {
-          console.log("Medicamento creado: ", response.data);
+          if (response.status !== 200) {
+            console.error("Error creating medicamento: ", response);
+            return;
+          }
           setMedicamento(response.data);
+          const responseData = response.data;
+          Swal.fire({
+            position: "top",
+            icon: "success",
+            title: "Medicamento creado",
+            text: response.data.message,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
         .catch((error) => {
           console.error("Error creating medicamento: ", error);
@@ -33,7 +45,6 @@ export const useFormMedicamento = (data = null) => {
             vencimiento: "",
             img: "",
           });
-          
         });
     }
   }, [data]);
