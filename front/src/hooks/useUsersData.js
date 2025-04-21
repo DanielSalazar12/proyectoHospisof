@@ -1,33 +1,41 @@
 // src/hooks/useUsersData.js
-import { useEffect, useState } from "react";
 import axios from "axios";
 
-export const useUsersData = () => {
-    const [usuarios, setUsuarios] = useState([]);
-
-    useEffect(() => {
-        axios.get("http://localhost:3000/api/usuario/listartodos")
-            .then((res) => {
-                console.log(" API:", res.data);
-                setUsuarios(res.data.listarUsuarios || []); // por si llega vacio la perra
-            })
-            .catch((err) => console.error("Error al cargar usuarios:", err));
-    }, []);
-
-    return usuarios;
+export const fetchUsers = async () => {
+    try {
+        const res = await axios.get("http://localhost:3000/api/usuario/listartodos");
+        return res.data.listarUsuarios || [];
+    } catch (err) {
+        console.error("Error al cargar usuarios:", err);
+        return [];
+    }
 };
 
-export const getRoles = () => {
-    const [roles, setRoles] = useState([]);
+export const fetchRoles = async () => {
+    try {
+        const res = await axios.get("http://localhost:3000/api/roles/listarTodos");
+        return res.data.listarRoles || [];
+    } catch (err) {
+        console.error("Error al cargar roles:", err);
+        return [];
+    }
+};
 
-    useEffect(() => {
-        axios.get("http://localhost:3000/api/roles/listarTodos")
-            .then((res) => {
-                console.log(" API de roles:", res.data);
-                setRoles(res.data.listarRoles || []);
-            })
-            .catch((err) => console.error("Error al cargar roles:", err));
-    }, []);
+export const createUser = async (formData) => {
+    try {
+        const response = await axios.post("http://localhost:3000/api/usuario/nuevo", formData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
 
-    return roles;
+export const deleteUser = async (id) => {
+    try {
+        const response = await axios.delete(`http://localhost:3000/api/usuario/eliminar/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error al eliminar usuario:", error);
+        throw error;
+    }
 };
