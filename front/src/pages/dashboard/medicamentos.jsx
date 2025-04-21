@@ -75,7 +75,7 @@ export function Medicamentos() {
             Prev
           </Button>
           {activeStep === 2 ? (
-            <Button variant="gradient" className="mr-1">
+            <Button variant="gradient" color="blue"  className="mr-1">
               Finalizar
             </Button>
           ) : (
@@ -89,7 +89,14 @@ export function Medicamentos() {
         <Typography variant="h4" className="text-light-blue-800 font-bold">
           Dispensario de Medicamentos
         </Typography>
-        <Tooltip content="Registrar Medicamento" placement="top">
+        <Tooltip
+          content="Registrar Medicamento"
+          animate={{
+            mount: { scale: 1, y: 0 },
+            unmount: { scale: 0, y: 25 },
+          }}
+          placement="left"
+        >
           <IconButton
             color="blue"
             className="rounded-full"

@@ -13,16 +13,12 @@ export const useApi = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios({
-          url,
-          method,
-          data: body,
-          headers: headears,
-        });
+        const response = await axios({url,method,data: body,headers: headears,});
         setData(response.data.data);
       } catch (err) {
         console.error("Error fetching medicamentos data: ", err);
         setError(err);
+        setData([]);
       } finally {
         setLoading(false);
       }

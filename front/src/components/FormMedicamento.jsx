@@ -46,7 +46,7 @@ const FormMedicamento = ({ activeStep }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     formulario.img = file;
-    console.log("Imagen seleccionada:", file);
+
     if (!file) return;
 
     const reader = new FileReader();
@@ -70,7 +70,6 @@ const FormMedicamento = ({ activeStep }) => {
 
   useEffect(() => {
     if (medicamento) {
-      console.log("Actualizando:", medicamento);
       setFormData({});
       setImagen(null);
     }
@@ -129,7 +128,7 @@ const FormMedicamento = ({ activeStep }) => {
               />
             </div>
             <div className="flex gap-4 mt-4">
-              <div className="w-full ">
+              <div className="w-full">
                 <Typography
                   variant="small"
                   color="blue-gray"
@@ -508,21 +507,21 @@ const FormMedicamento = ({ activeStep }) => {
                           <div className="border-t pt-2">
                             <Typography className="text-sm">
                               <span className="font-semibold">
-                                <i class="fa-solid fa-syringe"></i>{" "}
+                                <i className="fa-solid fa-syringe"></i>{" "}
                                 Administración:
                               </span>{" "}
                               {formulario.administracion}
                             </Typography>
                             <Typography className="text-sm">
                               <span className="font-semibold">
-                                <i class="fa-solid fa-prescription-bottle"></i>{" "}
+                                <i className="fa-solid fa-prescription-bottle"></i>{" "}
                                 Presentación:
                               </span>{" "}
                               {formulario.presentacion}
                             </Typography>
                             <Typography className="text-sm">
                               <span className="font-semibold">
-                                <i class="fa-solid fa-clipboard"></i>{" "}
+                                <i className="fa-solid fa-clipboard"></i>{" "}
                                 Descripción:
                               </span>{" "}
                               {formulario.descripcion}
@@ -531,14 +530,15 @@ const FormMedicamento = ({ activeStep }) => {
                           <div className="border-t pt-2">
                             <Typography className="text-sm">
                               <span className="font-semibold">
-                                <i class="fa-solid fa-calendar-days"></i>{" "}
+                                <i className="fa-solid fa-calendar-days"></i>{" "}
                                 Vencimiento:
                               </span>{" "}
                               {formulario.vencimiento}
                             </Typography>
                             <Typography className="text-sm">
                               <span className="font-semibold">
-                                <i class="fa-solid fa-box-archive"></i> Stock:
+                                <i className="fa-solid fa-box-archive"></i>{" "}
+                                Stock:
                               </span>{" "}
                               <span
                                 className={`font-bold px-2 py-1 rounded ${
@@ -547,7 +547,7 @@ const FormMedicamento = ({ activeStep }) => {
                                     : "bg-green-100 text-green-700"
                                 }`}
                               >
-                                {formulario.stock }
+                                {formulario.stock}
                               </span>
                             </Typography>
                           </div>
