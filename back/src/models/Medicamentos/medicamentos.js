@@ -49,7 +49,7 @@ const medicamentosSchema = new Schema(
       required: true
     },
     fechaVencimiento: {
-      type: Date,
+      type: String,
       required: true
     },
     precioCompra: {
@@ -60,12 +60,10 @@ const medicamentosSchema = new Schema(
       type: Number,
       required: true
     },
-    imgen: {
-      // (tabletas, frascos, ampollas)
+    imagen: {
       type: String,
       default: ""
     },
-
     status: {
       type: Number,
       required: true
