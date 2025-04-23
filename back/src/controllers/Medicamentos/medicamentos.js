@@ -87,7 +87,7 @@ export const add = async (data, file) => {
     };
   }
 };
-export const updateMedical = async (data,file) => {
+export const updateMedical = async (data, file, id) => {
   const extensionesValidas = ["png", "jpg", "jpeg", "gif"];
   let image = "";
   if (file) {
@@ -118,11 +118,13 @@ export const updateMedical = async (data,file) => {
     precioVenta: data.prVenta
   };
   try {
-    let medicalUpdate = await Medicamentos.findByIdAndUpdate(data.id, info);
+    let medicalUpdate = await Medicamentos.findByIdAndUpdate(id, info);
+    console.log(medicalUpdate);
+    console.log("id: " + id);
     return {
       estado: true,
       mensaje: "Actualizacion Exitosa!",
-      result: medicalUpdate
+      data: medicalUpdate
     };
   } catch (error) {
     return {
@@ -153,7 +155,7 @@ export const deleteById = async (data) => {
     let result = await Medicamentos.findByIdAndUpdate(id, { status: 0 });
     return {
       estado: true,
-      result: result
+      data: result
     };
   } catch (error) {
     return {

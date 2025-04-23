@@ -100,7 +100,7 @@ router.post(
   }
 );
 router.put(
-  "/medicamentos/update",
+  "/medicamentos/update/:id",
   uploads.single("img"),
   celebrate({
     body: schema
@@ -109,10 +109,12 @@ router.put(
     try {
       const { body: data } = req;
       const file = req.file;
+      const id = req.params.id;
+
       if (!file) {
         return res.status(400).json({ message: "No se ha subido ninguna imagen" });
       }
-      const response = await updateMedical(data, file);
+      const response = await updateMedical(data, file, id);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Error al actualizar" });
