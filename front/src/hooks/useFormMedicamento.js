@@ -17,7 +17,6 @@ export const useFormMedicamento = (data = null) => {
             return;
           }
           setMedicamento(response.data);
-          const responseData = response.data;
           Swal.fire({
             position: "top",
             icon: "success",

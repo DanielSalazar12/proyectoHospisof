@@ -18,7 +18,11 @@ import {
 } from "@material-tailwind/react";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
-export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
+export default function FormUpdaMedicamento({
+  dataForm,
+  setFormulario,
+  setStateOrder,
+}) {
   const [type, setType] = useState("general");
   const [form, setForm] = useState(dataForm);
   const [imagen, setImagen] = useState(null);
@@ -60,25 +64,42 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    const datos = {
+      id: form._id,
+      nombre: form.nombre,
+      codigo: generarCodigo(),
+      presentacion: form.presentacion,
+      descripcion: form.descripcion,
+      concentracion: form.concentracion,
+      formaFarma: form.formaFarmaceutica,
+      administracion: form.viaAdminist,
+      envase: form.uniEnvase,
+      medida: form.uniMedida,
+      stock: form.stockDisponible,
+      vencimiento: form.fechaVencimiento,
+      prCompra: form.precioCompra,
+      prVenta: form.precioVenta,
+      img: form.img,
+    };
 
-    const formData = new FormData();
-    formData.append("id", form._id);
+    /*   const formData = new FormData();
     formData.append("nombre", form.nombre);
     formData.append("codigo", generarCodigo());
     formData.append("presentacion", form.presentacion);
     formData.append("descripcion", form.descripcion);
     formData.append("concentracion", form.concentracion);
-    formData.append("formaFarma", form.formaFarma);
-    formData.append("administracion", form.administracion);
-    formData.append("envase", form.envase);
-    formData.append("medida", form.medida);
-    formData.append("stock", form.stock);
+    formData.append("formaFarma", form.formaFarmaceutica);
+    formData.append("administracion", form.viaAdminist);
+    formData.append("envase", form.uniEnvase);
+    formData.append("medida", form.uniMedida);
+    formData.append("stock", form.stockDisponible);
     formData.append("vencimiento", form.vencimiento);
     formData.append("prCompra", form.prCompra);
-    formData.append("prVenta", form.prVenta);
-    formData.append("img", form.img);
+    formData.append("prVenta", form.precioVenta);
+    formData.append("img", form.img); */
     console.log("Formulario enviado");
-    setFormulario(formData);
+    setFormulario(datos);
+    setStateOrder(true);
   };
   return (
     <form onSubmit={handleSubmit}>
@@ -144,7 +165,9 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                       type="text"
                       placeholder="eg. Paracetamol"
                       value={form.nombre}
+                      name="nombre"
                       className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                      onChange={handleChange}
                       labelProps={{
                         className: "before:content-none after:content-none",
                       }}
@@ -238,7 +261,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                         </Typography>
 
                         <Select
-                          name="medida"
+                          name="uniMedida"
                           value={form.uniMedida}
                           onChange={(option) =>
                             handleSelectChange("medida", option)
@@ -280,10 +303,10 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                         </Typography>
                         <Select
                           className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
-                          name="formaFarma"
+                          name="formaFarmaceutica"
                           value={form.formaFarmaceutica}
                           onChange={(option) =>
-                            handleSelectChange("formaFarma", option)
+                            handleSelectChange("formaFarmaceutica", option)
                           }
                         >
                           <Option value="tableta">Tableta</Option>
@@ -329,7 +352,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           name="descripcion"
                           className="placeholder:opacity-100 focus:!border-t-gray-900"
                           value={form.descripcion}
-                          onChange={"handleChange"}
+                          onChange={handleChange}
                           containerProps={{
                             className: "!min-w-full",
                           }}
@@ -378,7 +401,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           name="envase"
                           value={form.uniEnvase}
                           onChange={(option) =>
-                            handleSelectChange("envase", option)
+                            handleSelectChange("uniEnvase", option)
                           }
                         >
                           <Option value="caja">Caja</Option>
@@ -414,7 +437,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           icon={
                             <i className="fa-solid fa-dollar-sign text-gray-500" />
                           }
-                          name="prCompra"
+                          name="precioCompra"
                           value={form.precioCompra}
                           onChange={handleChange}
                           className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -435,7 +458,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           icon={
                             <i className="fa-solid fa-dollar-sign text-gray-500" />
                           }
-                          name="prVenta"
+                          name="precioVenta"
                           value={form.precioVenta}
                           onChange={handleChange}
                           type="number"
@@ -457,7 +480,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           size="lg"
                           type="number"
                           placeholder="eg. 12 | 24 | 30"
-                          name="stock"
+                          name="stockDisponible"
                           value={form.stockDisponible}
                           onChange={handleChange}
                           icon={<i className="fa-solid fa-box text-gray-500" />}
@@ -476,7 +499,7 @@ export default function FormUpdaMedicamento({ dataForm, setFormulario }) {
                           color="gray"
                           size="lg"
                           placeholder="$0.00"
-                          name="vencimiento"
+                          name="fechaVencimiento"
                           onChange={handleChange}
                           type="date"
                           className="placeholder:opacity-100 focus:!border-t-gray-900"
