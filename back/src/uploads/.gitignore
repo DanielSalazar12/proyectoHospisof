@@ -1,2 +1,5 @@
-/medicamentos/*
+
+/medicamentos/
+/medicamentos/!note.txt
+
 !gitignore

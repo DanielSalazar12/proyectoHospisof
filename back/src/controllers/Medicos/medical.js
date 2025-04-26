@@ -1,16 +1,26 @@
-// controlador medico
-import Medicamentos from "../../models/Medicamentos/medicamentos.js";
-// node nativo : fs : filessystem instanciamos para manipular el sistema de archivos del servidor
+import Medical from "../../models/Medicos/medical.js";
 import fs from "fs";
-// modulo nativo de node util para manejar las rutas
 import path from "path";
+export const getAll = async (limit, page) => {
+  const paginaActual = parseInt(page) || 1;
+  const porPagina = parseInt(limit) || 10;
 
-export const getAll = async () => {
+  const totalElementos = await Medical.countDocuments();
+  const totalPaginas = Math.ceil(totalElementos / porPagina);
+  console.log("Elementos: " + totalElementos);
+
   try {
-    let listaMedicos = await Medicamentos.find({ status: 1 }).exec();
+    const medicos = await Medical.find({ status: 1 }).skip((paginaActual - 1) * porPagina).limit(porPagina);
+    const paginacion = {
+      paginaActual: paginaActual,
+      totalPaginas: totalPaginas,
+      porPagina: porPagina,
+      totalElementos: totalElementos,
+    };
     return {
       estado: true,
-      data: listaMedicos,
+      data: medicos,
+      paginacion,
     };
   } catch (error) {
     return {
@@ -21,7 +31,7 @@ export const getAll = async () => {
 };
 export const renderImagen = async (img) => {
   const file = img;
-  const filepath = "./src/uploads/medicamentos/" + file;
+  const filepath = "./src/uploads/medicos/" + file;
   await fs.stat(filepath, (error, exists) => {
     if (!exists) {
       return {
@@ -29,14 +39,14 @@ export const renderImagen = async (img) => {
         message: `No existe la imagen: ${error}}`,
       };
     }
-    // Devolver un file
+
     return sendFile(path.resolve(filepath));
   });
 };
 export const add = async (data, file) => {
   const extensionesValidas = ["png", "jpg", "jpeg", "gif"];
-  const medicamentExist = await Medicamentos.findOne({
-    codigo: data.codigo,
+  const medicalExist = await Medical.findOne({
+    documento: data.documento,
   });
   let image = "";
   if (file) {
@@ -51,44 +61,35 @@ export const add = async (data, file) => {
     }
     image = file.filename;
   }
-  if (medicamentExist) {
+  if (medicalExist) {
     if (file) {
       const imagePath = path.join(file.destination, image);
       fs.unlink(imagePath, (err) => {
         if (err)
-          console.error(
-            "Error al eliminar imagen por médicamento exitesnte:",
-            err
-          );
+          console.error("Error al eliminar imagen por médico existente:", err);
       });
     }
     return {
       estado: false,
-      mensaje: "El Medicametno ya existe en el sistema",
+      mensaje: "El Medico ya existe en el sistema",
     };
   }
+
   try {
-    const medicalNuevo = new Medicamentos({
-      nombre: data.nombre,
-      codigo: data.codigo,
-      presentacion: data.presentacion,
-      descripcion: data.descripcion,
-      concentracion: data.concentracion,
-      formaFarmaceutica: data.formaFarma,
-      viaAdminist: data.administracion,
-      uniEnvase: data.envase,
-      uniMedida: data.medida,
-      stockDisponible: data.stock,
-      fechaVencimiento: data.vencimiento,
-      imagen: image,
-      precioCompra: data.prCompra,
-      precioVenta: data.prVenta,
+    const medicalNuevo = new Medical({
+      nombreMedico: data.nombre,
+      apellidoMedico: data.apellido,
+      documento: data.documento,
+      emailMedico: data.email,
+      fechaNacimiento: data.fechaNacimiento,
+      especialidad: data.especialidad,
+      foto: image,
       status: 1,
     });
     await medicalNuevo.save();
     return {
       estado: true,
-      mensaje: "Medicamento Registrado exitosamente",
+      mensaje: "Medico Registrado exitosamente",
     };
   } catch (error) {
     if (file) {
@@ -103,7 +104,7 @@ export const add = async (data, file) => {
     };
   }
 };
-export const updateMedicament = async (data, file, id) => {
+export const updateMedical = async (data, file, id) => {
   const extensionesValidas = ["png", "jpg", "jpeg", "gif"];
   let image = "";
   if (file) {
@@ -118,23 +119,16 @@ export const updateMedicament = async (data, file, id) => {
     image = file.filename;
   }
   let info = {
-    nombre: data.nombre,
-    codigo: data.codigo,
-    presentacion: data.presentacion,
-    descripcion: data.descripcion,
-    concentracion: data.concentracion,
-    formaFarmaceutica: data.formaFarma,
-    viaAdminist: data.administracion,
-    uniEnvase: data.envase,
-    uniMedida: data.medida,
-    stockDisponible: data.stock,
-    fechaVencimiento: data.vencimiento,
-    imagen: image,
-    precioCompra: data.prCompra,
-    precioVenta: data.prVenta,
+    nombreMedico: data.nombre,
+    apellidoMedico: data.apellido,
+    documento: data.documento,
+    emailMedico: data.email,
+    fechaNacimiento: data.fechaNacimiento,
+    especialidad: data.especialidad,
+    foto: image,
   };
   try {
-    let medicalUpdate = await Medicamentos.findByIdAndUpdate(id, info);
+    let medicalUpdate = await Medical.findByIdAndUpdate(id, info);
     console.log(medicalUpdate);
     console.log("id: " + id);
     return {
@@ -158,11 +152,11 @@ export const updateMedicament = async (data, file, id) => {
 export const searchById = async (data) => {
   let id = data.id;
   try {
-    let result = await Medicamentos.findById(id).exec();
+    let result = await Medical.findById(id).exec();
     return {
       estado: true,
       mensaje: "Consulta Exitosa",
-      result: result,
+      data: result,
     };
   } catch (error) {
     return {
@@ -174,7 +168,7 @@ export const searchById = async (data) => {
 export const deleteById = async (data) => {
   let id = data.id;
   try {
-    let result = await Medicamentos.findByIdAndUpdate(id, { status: 0 });
+    let result = await Medical.findByIdAndUpdate(id, { status: 0 });
     return {
       estado: true,
       data: result,

@@ -1,76 +1,68 @@
-import express, { json } from "express";
+import express from "express";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
 const router = express.Router();
 import {
   getAll,
   add,
   updateMedical,
-  renderImagen,
+  deleteById,
   searchById,
-  deleteById
-} from "../controllers/Medicamentos/medicamentos.js";
-import path from "path";
-import fs from "fs";
-import { celebrate, Joi, errors, Segments } from "celebrate";
+} from "../controllers/Medicos/medical.js";
 
-// configurar un bodega para las imagenes de multer
+import { celebrate, Joi, errors } from "celebrate";
+
 const storage = multer.diskStorage({
-  // ruta de destino para almacenar los archivos
   destination: (req, file, cb) => {
-    cb(null, "./src/uploads/medicamentos/");
+    cb(null, "./src/uploads/medicos/");
   },
-  // estructara para determinar los archivos
-  filename: (req, file, cb) => {
-    // armamos el nombre del archivo
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
 
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 const schema = Joi.object({
   nombre: Joi.string().required(),
-  codigo: Joi.string().required(),
-  presentacion: Joi.string().required(),
-  descripcion: Joi.string().required(),
-  concentracion: Joi.string().required(),
-  formaFarma: Joi.string().required(),
-  administracion: Joi.string().required(),
-  envase: Joi.string().required(),
-  medida: Joi.string().required(),
-  stock: Joi.number().required(),
-  vencimiento: Joi.string().required(),
-  prCompra: Joi.number().required(),
-  prVenta: Joi.number().required()
+  apellido: Joi.string().required(),
+  documento: Joi.number().required(),
+  email: Joi.string().required(),
+  especialidad: Joi.string().required(),
+  fechaNacimiento: Joi.string().required(),
 });
 
 const uploads = multer({ storage });
-router.get("/medicamentos/list", async (req, res) => {
+router.get("/medical/list/:page/:limit", async (req, res) => {
   try {
-    const response = await getAll();
+    const page = parseInt(req.params.page || 1);
+    const limit = parseInt(req.params.limit || 10);
+
+    const response = await getAll(limit, page);
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener la lista de medicamentos" });
+    res.status(500).json({ message: "Error al obtener la lista de medicos" });
   }
 });
-router.get("/medicamentos/image/:file", async (req, res) => {
+router.get("/medical/image/:file", async (req, res) => {
   const { file } = req.params;
   try {
-    const filepath = path.resolve("./src/uploads/medicamentos", file);
+    const filepath = path.resolve("./src/uploads/medicos", file);
 
     fs.stat(filepath, (err, stats) => {
       if (err || !stats.isFile()) {
         return res.status(404).json({
           status: false,
-          message: `No existe la imagen: ${file}`
+          message: `No existe la imagen: ${file}`,
         });
       }
-      // Enviar el archivo como respuesta
+
       res.sendFile(filepath);
     });
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la imagen" });
   }
 });
-router.get("/medicamentos/:id", async (req, res) => {
+router.get("/medical/searchById:id", async (req, res) => {
   try {
     const data = req.params.id;
     const response = await searchById(data);
@@ -80,30 +72,35 @@ router.get("/medicamentos/:id", async (req, res) => {
   }
 });
 router.post(
-  "/medicamentos/create",
+  "/medical/create",
   uploads.single("img"),
   celebrate({
-    body: schema
+    body: schema,
   }),
   async (req, res) => {
     try {
       const { body: data } = req;
       const file = req.file;
       if (!file) {
-        return res.status(400).json({ message: "No se ha subido ninguna imagen" });
+        return res
+          .status(400)
+          .json({ message: "No se ha subido ninguna imagen" });
       }
       const response = await add(data, file);
       res.status(200).json(response);
     } catch (error) {
-      res.status(500).json({ message: `Error al Registrar el Medicamento`, error: `${error}` });
+      res.status(500).json({
+        message: `Error al Registrar el Medicamento`,
+        error: `${error}`,
+      });
     }
   }
 );
 router.put(
-  "/medicamentos/update/:id",
+  "/medical/update/:id",
   uploads.single("img"),
   celebrate({
-    body: schema
+    body: schema,
   }),
   async (req, res) => {
     try {
@@ -112,7 +109,9 @@ router.put(
       const id = req.params.id;
 
       if (!file) {
-        return res.status(400).json({ message: "No se ha subido ninguna imagen" });
+        return res
+          .status(400)
+          .json({ message: "No se ha subido ninguna imagen" });
       }
       const response = await updateMedical(data, file, id);
       res.status(200).json(response);
@@ -122,11 +121,11 @@ router.put(
   }
 );
 router.post(
-  "/medicamentos/delet",
+  "/medical/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required()
-    })
+      id: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     try {
