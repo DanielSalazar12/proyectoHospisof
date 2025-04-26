@@ -30,22 +30,22 @@ export function Tables() {
   const [roles, setRoles] = useState([]);
   const [open, setOpen] = useState(false);// Esto es de la modal (false cerrada, true abierta)
 
+
   const [formData, setFormData] = useState({
     nombre: "",
-    apellido: "",
+    fecha: "",
+    documento: "",
     email: "",
     telefono: "",
-    especialidad: "",
-    rol: "",
-    userName: "",
-    passwordUser: "",
+    eps: "",
+    idUsuario:"",
   });
 
   const cargarDatos = async () => {
-    const usuariosData = await fetchUsers();
-    const rolesData = await fetchRoles();
-    setUsuarios(usuariosData);
-    setRoles(rolesData);
+   // const usuariosData = await fetchUsers();
+   // const rolesData = await fetchRoles();
+   // setUsuarios(usuariosData);
+   // setRoles(rolesData);
   };
 
   useEffect(() => {
@@ -137,15 +137,26 @@ export function Tables() {
           Registrar Usuario
         </Button>
       </div>
-
       <Dialog open={open} handler={abrirModalUsuarios}>
         <DialogHeader>Registrar nuevo usuario</DialogHeader>
         <DialogBody className="flex flex-col gap-4">
           <Input label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
-          <Input label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} />
-          <Input label="Email" name="email" value={formData.email} onChange={handleChange} />
-          <Input label="Teléfono" name="telefono" value={formData.telefono} onChange={handleChange} />
-          <Input label="Especialidad" name="especialidad" value={formData.especialidad} onChange={handleChange} />
+          <Input label="Fecha" type="date" name="fecha" value={formData.apellido} onChange={handleChange} />
+          <Input label="Documento" name="documento" value={formData.email} onChange={handleChange} />
+          <Input label="Email" type="email" name="email" value={formData.telefono} onChange={handleChange} />
+          <Input label="Telefono" type="number" name="telefono" value={formData.especialidad} onChange={handleChange} />
+          <Select
+            label="Rol"
+            name="rol"
+            value={formData.rol}
+            onChange={(val) => setFormData({ ...formData, rol: val })}
+          >
+            {roles.map((rol) => (
+              <Option key={rol._id} value={rol._id}>
+                {rol.nombreRol}
+              </Option>
+            ))}
+          </Select>
           <Select
             label="Rol"
             name="rol"
@@ -160,6 +171,7 @@ export function Tables() {
           </Select>
           <Input label="Nombre de usuario" name="userName" value={formData.userName} onChange={handleChange} />
           <Input label="Contraseña" name="passwordUser" type="password" value={formData.passwordUser} onChange={handleChange} />
+          
         </DialogBody>
         <DialogFooter>
           <Button variant="text" color="red" onClick={abrirModalUsuarios} className="mr-2">

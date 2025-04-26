@@ -49,6 +49,7 @@ router.post(
       email: Joi.string().required(),
       telefono: Joi.number().required(),
       eps: Joi.string().required(),
+      idUsuario: Joi.string().hex().length(24).required(),
     }),
   }),
   async (req, res) => {
@@ -61,6 +62,7 @@ router.post(
     }
   }
 );
+
 router.post(
   "/patient/update",
   celebrate({
@@ -72,6 +74,7 @@ router.post(
       email: Joi.string().required(),
       telefono: Joi.number().required(),
       eps: Joi.string().required(),
+      idUsuario: Joi.string().hex().length(24).required(),
     }),
   }),
   async (req, res) => {

@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose"; // Importa Types aquí
+
 const patientSchema = new Schema(
   {
     nombrePaciente: {
@@ -25,6 +26,11 @@ const patientSchema = new Schema(
       type: String,
       required: true,
     },
+    idUsuario: {
+      type: Types.ObjectId, // Esto es para la foránea de Usuarios
+      ref: "Usuario",
+      required: true,
+    },
     status: {
       type: Number,
       required: true,
@@ -32,4 +38,5 @@ const patientSchema = new Schema(
   },
   { collection: "pacientes" }
 );
+
 export default model("Patients", patientSchema);

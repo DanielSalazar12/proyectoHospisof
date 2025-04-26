@@ -1,4 +1,5 @@
 import Patients from "../../models/Paciente/patient.js";
+import { Types } from "mongoose";
 export const getAll = async () => {
   try {
     let listaMedicos = await Patients.find().exec();
@@ -31,6 +32,7 @@ export const add = async (data) => {
       telefonoPaciente: data.telefono,
       fechaNacimiento: data.fecha,
       epsPaciente: data.eps,
+      idUsuario: new Types.ObjectId(data.idUsuario),
       status: 1,
     });
     await patientNuevo.save();
@@ -45,6 +47,7 @@ export const add = async (data) => {
     };
   }
 };
+
 export const updatePatient = async (data) => {
   let id = data.id;
   let info = {
@@ -54,6 +57,7 @@ export const updatePatient = async (data) => {
     telefonoPaciente: data.telefono,
     fechaNacimiento: data.fecha,
     epsPaciente: data.eps,
+    idUsuario: new Types.ObjectId(data.idUsuario),
   };
   try {
     let patientUpdate = await Patients.findByIdAndUpdate(id, info);
@@ -69,6 +73,7 @@ export const updatePatient = async (data) => {
     };
   }
 };
+
 export const searchById = async (data) => {
   let id = data.id;
   try {
