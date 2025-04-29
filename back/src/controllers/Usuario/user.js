@@ -22,32 +22,30 @@ const listarTodos = async (req, res) => {
 
 const nuevo = async (req, res) => {
   let datos = {
-    nombre: req.body.nombre,
-    apellido: req.body.apellido,
-    email: req.body.email,
-    telefono: req.body.telefono,
-    especialidad: req.body.especialidad,
-    rol: req.body.rol,
-    userName: req.body.userName,
+    nombreUsuario: req.body.nombreUsuario,
     passwordUser: req.body.passwordUser,
+    emailUser: req.body.emailUser,
+    rol: req.body.rol,
+    status: req.body.status || 1,
   };
 
   try {
     const usuarioNuevo = new Usuarios(datos);
-
-    usuarioNuevo.save(); //Escribe el mongo
+    await usuarioNuevo.save();
 
     return res.send({
       estado: true,
-      mensaje: `Insercion exitosa`,
+      mensaje: "Inserción exitosa",
+      usuario: usuarioNuevo,
     });
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `A ocurrido un error en la consulta ${error}`,
+      mensaje: `Ha ocurrido un error en la consulta: ${error}`,
     });
   }
 };
+
 
 const buscarPorId = async (req, res) => {
   let id = req.params.id;

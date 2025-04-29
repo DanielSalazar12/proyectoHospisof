@@ -1,11 +1,14 @@
 import Patients from "../../models/Paciente/patient.js";
 import { Types } from "mongoose";
+
 export const getAll = async () => {
   try {
-    let listaMedicos = await Patients.find().exec();
+    let listaPacientes = await Patients.find()
+      .populate('idUsuario') // Con esto relaciona el campo y segunel id, trae los datos del usuario
+      .exec();
     return {
       estado: true,
-      data: listaMedicos,
+      data: listaPacientes,
     };
   } catch (error) {
     return {
@@ -14,6 +17,7 @@ export const getAll = async () => {
     };
   }
 };
+
 
 export const add = async (data) => {
   const patientExist = await Patients.findOne({ documento: data.documento });
@@ -28,7 +32,6 @@ export const add = async (data) => {
     const patientNuevo = new Patients({
       nombrePaciente: data.nombre,
       documento: data.documento,
-      emailPaciente: data.email,
       telefonoPaciente: data.telefono,
       fechaNacimiento: data.fecha,
       epsPaciente: data.eps,

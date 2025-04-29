@@ -46,7 +46,6 @@ router.post(
       nombre: Joi.string().required(),
       fecha: Joi.date().required(),
       documento: Joi.number().required(),
-      email: Joi.string().required(),
       telefono: Joi.number().required(),
       eps: Joi.string().required(),
       idUsuario: Joi.string().hex().length(24).required(),

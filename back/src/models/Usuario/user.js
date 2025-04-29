@@ -9,6 +9,10 @@ const usuarioSchema = new Schema(
       type: String,
       required: true,
     },
+    emailUser: {
+      type: String,
+      required: true,
+    },
     rol: {
       type: Types.ObjectId, // Esto es para la foranea de roles
       ref: "Roles",
