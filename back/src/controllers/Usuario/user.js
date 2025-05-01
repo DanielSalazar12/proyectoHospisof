@@ -22,14 +22,10 @@ const listarTodos = async (req, res) => {
 
 const nuevo = async (req, res) => {
   let datos = {
-    nombre: req.body.nombre,
-    apellido: req.body.apellido,
-    email: req.body.email,
-    telefono: req.body.telefono,
-    especialidad: req.body.especialidad,
-    rol: req.body.rol,
-    userName: req.body.userName,
-    passwordUser: req.body.passwordUser
+    nombreUser: req.body.nombre,
+    passwordUser: req.body.apellido,
+    emailUser: req.body.email,
+    status: 1
   };
 
   try {
@@ -51,7 +47,6 @@ const nuevo = async (req, res) => {
 
 const buscarPorId = async (req, res) => {
   let id = req.params.id;
-
   try {
     //Logica de buscar  mostrar el resultado
     //let consulta = await producto.find(id).exec();
@@ -74,18 +69,13 @@ const buscarPorId = async (req, res) => {
 
 const actualizarPorId = async (req, res) => {
   //Recibe el parametro de la consulta
-
   let id = req.params.id;
 
   let datos = {
-    nombre: req.body.nombre,
-    apellido: req.body.apellido,
-    email: req.body.email,
-    telefono: req.body.telefono,
-    especialidad: req.body.especialidad,
-    rol: req.body.rol,
-    userName: req.body.userName,
-    passwordUser: req.body.passwordUser
+    nombreUser: req.body.nombre,
+    passwordUser: req.body.apellido,
+    emailUser: req.body.email,
+    rol: req.body.rol
   };
 
   try {

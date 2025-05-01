@@ -8,7 +8,7 @@ import {
   searchById,
   subirImagen,
   deleteById,
-  avatar,
+  avatar
 } from "../controllers/Paciente/patient.js";
 
 import { celebrate, Joi, errors, Segments } from "celebrate";
@@ -48,8 +48,8 @@ router.post(
       documento: Joi.number().required(),
       email: Joi.string().required(),
       telefono: Joi.number().required(),
-      eps: Joi.string().required(),
-    }),
+      eps: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {
@@ -71,8 +71,8 @@ router.post(
       documento: Joi.number().required(),
       email: Joi.string().required(),
       telefono: Joi.number().required(),
-      eps: Joi.string().required(),
-    }),
+      eps: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {
@@ -89,8 +89,8 @@ router.post(
   "/patient/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required(),
-    }),
+      id: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {
@@ -102,5 +102,5 @@ router.post(
     }
   }
 );
-
+router.use(errors());
 export default router;

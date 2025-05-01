@@ -5,9 +5,16 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  HeartIcon,
 } from "@heroicons/react/24/solid";
 
-import { Home, Profile, Notifications, Medicamentos } from "@/pages/dashboard"; //importamos los componentes de las paginas
+import {
+  Home,
+  Profile,
+  Notifications,
+  Medicamentos,
+  Medicos,
+} from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
 
@@ -36,6 +43,12 @@ export const routes = [
         name: "medicamentos",
         path: "/medicamentos",
         element: <Medicamentos />,
+      },
+      {
+        icon: <HeartIcon {...icon} />,
+        name: "medicos",
+        path: "/medicos",
+        element: <Medicos />,
       },
       {
         icon: <InformationCircleIcon {...icon} />,

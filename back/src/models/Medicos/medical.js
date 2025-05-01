@@ -4,36 +4,40 @@ const medicalShema = new Schema(
   {
     nombreMedico: {
       type: String,
-      require: true,
+      require: true
     },
     apellidoMedico: {
       type: String,
-      require: true,
+      require: true
     },
     documento: {
       type: Number,
-      require: true,
+      require: true
     },
     emailMedico: {
       type: String,
-      require: true,
+      require: true
+    },
+    telefono: {
+      type: Number,
+      require: true
     },
     fechaNacimiento: {
       type: String,
-      require: true,
+      require: true
     },
     especialidad: {
       type: String,
-      require: true,
+      require: true
     },
     foto: {
       type: String,
-      require: true,
+      require: true
     },
     status: {
       type: String,
-      require: true,
-    },
+      require: true
+    }
   },
   { collection: "medicos" }
 );

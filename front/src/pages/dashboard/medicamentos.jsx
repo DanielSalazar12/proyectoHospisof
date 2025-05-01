@@ -22,9 +22,9 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { useState } from "react";
-import { useApi } from "@/hooks/useApiMedicamentos";
-import FormMedicamento from "@/components/FormMedicamento";
-import ListMedicamentos from "@/components/ListMedicamentos";
+
+import FormMedicamento from "@/components/medicamentos/FormMedicamento";
+import ListMedicamentos from "@/components/medicamentos/ListMedicamentos";
 
 export function Medicamentos() {
   const [activeStep, setActiveStep] = useState(0);
@@ -75,7 +75,7 @@ export function Medicamentos() {
             Prev
           </Button>
           {activeStep === 2 ? (
-            <Button variant="gradient" color="blue"  className="mr-1">
+            <Button variant="gradient" color="blue" className="mr-1">
               Finalizar
             </Button>
           ) : (
