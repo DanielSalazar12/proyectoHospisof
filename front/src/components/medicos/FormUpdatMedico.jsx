@@ -11,28 +11,25 @@ import {
   TabsHeader,
   Typography,
 } from "@material-tailwind/react";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { especialidades } from "@/data";
-import Swal from "sweetalert2";
 import axios from "axios";
-const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
-  const [imagen, setImagen] = useState(null);
+import Swal from "sweetalert2";
+export default function FormUpdatMedico({
+  dataForm,
+  setRefresh,
+  stateModal,
+  urlApi,
+}) {
   const [type, setType] = useState("Informacion");
+  const [form, setForm] = useState(dataForm);
+  const [imagen, setImagen] = useState(null);
+  const [update, setUpdate] = useState([]);
   const [especialidad, setEspecialidad] = useState([]);
-  const [formulario, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    documento: 0,
-    fechaNacimiento: "",
-    email: "",
-    telefono: "",
-    especialidad: "",
-    foto: "",
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -43,14 +40,14 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
     setEspecialidad(data);
   };
   const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({
+    setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    formulario.foto = file;
+    form.foto = file;
 
     if (!file) return;
 
@@ -65,52 +62,55 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("nombre", formulario.nombre);
-    formData.append("apellido", formulario.apellido);
-    formData.append("documento", formulario.documento);
-    formData.append("fechaNacimiento", formulario.fechaNacimiento);
-    formData.append("telefono", formulario.telefono);
-    formData.append("email", formulario.email);
-    formData.append("especialidad", formulario.especialidad);
-    formData.append("foto", formulario.foto);
-    hanlseInsert(formData);
+
+    const datos = {
+      id: form._id,
+      nombre: form.nombreMedico,
+      apellido: form.apellidoMedico,
+      documento: form.documento,
+      fechaNacimiento: form.fechaNacimiento,
+      telefono: form.telefono,
+      email: form.emailMedico,
+      especialidad: form.especialidad,
+      foto: form.foto,
+    };
+    handleEdit(datos);
     console.log("Formulario enviado");
   };
-  const hanlseInsert = useCallback(
+
+  const handleEdit = useCallback(
     async (data) => {
       if (typeof data === "object") {
-        try {
-          const response = await axios.post(urlApi + "create/", data, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
+        const { id, ...formUpdate } = data;
+        const formData = new FormData();
+        Object.entries(formUpdate).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
 
+        try {
+          const response = await axios.put(
+            urlApi + "update/" + data.id,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            },
+          );
           if (response.data.estado === true) {
             setRefresh(true);
             stateModal(false);
             Swal.fire({
-              title: "Registrado",
-              text: response.data.mensaje,
+              title: "Actualizado",
+              text: "El Medico se ha actualizado",
               icon: "success",
               showConfirmButton: false,
-              timer: 1700,
-            });
-            setFormData({
-              nombre: "",
-              apellido: "",
-              documento: 0,
-              fechaNacimiento: "",
-              email: "",
-              telefono: "",
-              especialidad: "",
-              foto: "",
+              timer: 1900,
             });
           } else {
             Swal.fire({
               title: "Error",
-              text: "No se pudo Registrar el medico",
+              text: "No se pudo actualizar el medico",
               icon: "error",
               showConfirmButton: false,
             });
@@ -123,8 +123,9 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
         console.log("No es un Object :", data);
       }
     },
-    [setRefresh, urlApi],
+    [urlApi],
   );
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -160,10 +161,10 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                     <div className="w-full">
                       <Input
                         type="text"
-                        name="nombre"
+                        name="nombreMedico"
                         color="blue"
                         required
-                        value={formulario.nombre}
+                        value={form.nombreMedico}
                         label="Nombre"
                         onChange={handleChange}
                       ></Input>
@@ -173,10 +174,10 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                         type="text"
                         size="lg"
                         color="blue"
-                        name="apellido"
+                        name="apellidoMedico"
                         label="Apellido"
                         variant="outlined"
-                        value={formulario.apellido}
+                        value={form.apellidoMedico}
                         required
                         onChange={handleChange}
                       ></Input>
@@ -189,7 +190,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                         color="blue"
                         name="documento"
                         label="Documento"
-                        value={formulario.documento}
+                        value={form.documento}
                         required
                         onChange={handleChange}
                       ></Input>
@@ -203,7 +204,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                         color="blue"
                         name="telefono"
                         label="Telefono"
-                        value={formulario.telefono}
+                        value={form.telefono}
                         required
                         onChange={handleChange}
                       ></Input>
@@ -211,10 +212,10 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                     <div className="w-full">
                       <Input
                         type="email"
-                        name="email"
+                        name="emailMedico"
                         color="blue"
                         label="Email"
-                        value={formulario.email}
+                        value={form.emailMedico}
                         required
                         onChange={handleChange}
                       ></Input>
@@ -227,7 +228,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                         name="fechaNacimiento"
                         color="blue"
                         label="Fecha Nacimiento"
-                        value={formulario.fechaNacimiento}
+                        value={form.fechaNacimiento}
                         required
                         onChange={handleChange}
                       ></Input>
@@ -265,7 +266,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                         name="especialidad"
                         label="Especialidad"
                         variant="outlined"
-                        value={formulario.especialidad}
+                        value={form.especialidad}
                         required
                         animate={{
                           mount: { y: 0 },
@@ -336,13 +337,13 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                                     variant="h6"
                                     className="text-lg font-bold text-blue-800"
                                   >
-                                    {formulario.nombre} {formulario.apellido}
+                                    {form.nombreMedico} {form.apellidoMedico}
                                   </Typography>
                                   <Typography className="text-sm">
                                     <span className="font-semibold">
                                       Documento:
                                     </span>{" "}
-                                    {formulario.documento}
+                                    {form.documento}
                                   </Typography>
                                 </div>
                                 <div className="border-t pt-2">
@@ -351,21 +352,21 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                                       <i className="fa-solid fa-clipboard"></i>{" "}
                                       Telefono:
                                     </span>{" "}
-                                    {formulario.telefono}
+                                    {form.telefono}
                                   </Typography>{" "}
                                   <Typography className="text-sm">
                                     <span className="font-semibold">
                                       <i className="fa-solid fa-clipboard"></i>{" "}
                                       Email:
                                     </span>{" "}
-                                    {formulario.email}
+                                    {form.emailMedico}
                                   </Typography>
                                   <Typography className="text-sm">
                                     <span className="font-semibold">
                                       <i className="fa-solid fa-clipboard"></i>{" "}
                                       Especialidad:
                                     </span>{" "}
-                                    {formulario.especialidad}
+                                    {form.especialidad}
                                   </Typography>
                                 </div>
                                 <div className="border-t pt-2">
@@ -374,7 +375,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
                                       <i className="fa-solid fa-calendar-days"></i>{" "}
                                       Fecha Nacimiento:
                                     </span>{" "}
-                                    {formulario.fechaNacimiento}
+                                    {form.fechaNacimiento}
                                   </Typography>
                                 </div>
                               </div>
@@ -389,7 +390,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
             </TabPanel>
             {type === "Foto" ? (
               <Button color="green" type="submit" fullWidth>
-                Registrar
+                Actualizar
               </Button>
             ) : null}
           </TabsBody>
@@ -397,6 +398,4 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
       </form>
     </>
   );
-};
-
-export default FormMedico;
+}

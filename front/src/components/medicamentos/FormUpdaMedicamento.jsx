@@ -81,22 +81,6 @@ export default function FormUpdaMedicamento({
       prVenta: form.precioVenta,
       img: form.img,
     };
-
-    /*   const formData = new FormData();
-    formData.append("nombre", form.nombre);
-    formData.append("codigo", generarCodigo());
-    formData.append("presentacion", form.presentacion);
-    formData.append("descripcion", form.descripcion);
-    formData.append("concentracion", form.concentracion);
-    formData.append("formaFarma", form.formaFarmaceutica);
-    formData.append("administracion", form.viaAdminist);
-    formData.append("envase", form.uniEnvase);
-    formData.append("medida", form.uniMedida);
-    formData.append("stock", form.stockDisponible);
-    formData.append("vencimiento", form.vencimiento);
-    formData.append("prCompra", form.prCompra);
-    formData.append("prVenta", form.precioVenta);
-    formData.append("img", form.img); */
     console.log("Formulario enviado");
     setFormulario(datos);
     setStateOrder(true);

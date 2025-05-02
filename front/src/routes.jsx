@@ -6,6 +6,7 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
   HeartIcon,
+  ClipboardIcon,
 } from "@heroicons/react/24/solid";
 
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
+import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -45,7 +47,7 @@ export const routes = [
         element: <Medicamentos />,
       },
       {
-        icon: <HeartIcon {...icon} />,
+        icon: <ClipboardDocumentIcon {...icon} />,
         name: "medicos",
         path: "/medicos",
         element: <Medicos />,

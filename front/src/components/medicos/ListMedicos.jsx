@@ -11,29 +11,35 @@ import {
   MenuList,
   MenuHandler,
   Menu,
+  Dialog,
+  DialogHeader,
+  DialogBody,
 } from "@material-tailwind/react";
 
 import { useState, useEffect, useCallback } from "react";
+import Swal from "sweetalert2";
 import axios from "axios";
+import FormUpdatMedico from "./FormUpdatMedico";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 const ListMedicos = ({
+  urlApi,
   medicos,
   loading,
   error,
   buscar,
-  setBusqueda,
   paginacion,
   handlePageChange,
-  urlApi,
+  setBusqueda,
+  onRefresh,
 }) => {
   const [detalles, setdetalles] = useState(null);
   const [update, setUpdate] = useState([]);
-  const [refresh, setRefresh] = useState(false);
-  const [staOrder, setStateOrde] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const busqueda = medicos.filter((medico) =>
     medico.nombreMedico.toLowerCase().includes(buscar.toLowerCase()),
   );
-  
+
   const handleOpen = (documento, action) => {
     let info = medicos.find((medico) => medico.documento === documento);
     action === "edit" ? setOpen2(!open2) : setOpen(!open);
@@ -42,7 +48,7 @@ const ListMedicos = ({
   const handleDelete = useCallback(
     async (id) => {
       Swal.fire({
-        title: "¿Está seguro de que desea eliminar este medicamento?",
+        title: "¿Está seguro de que desea eliminar este medico?",
         text: "No podrá revertir esta acción",
         icon: "warning",
         showCancelButton: true,
@@ -53,15 +59,24 @@ const ListMedicos = ({
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await axios.post(urlApi + "delet", { id });
-            setRefresh(!refresh);
-            Swal.fire({
-              title: "Eliminado",
-              text: "El medico ha sido eliminado",
-              icon: "success",
-              showConfirmButton: false,
-              timer: 1700,
-            });
+            const response = await axios.post(urlApi + "delet", { id });
+            if (response.data.estado === true) {
+              onRefresh(true);
+              Swal.fire({
+                title: "Eliminado",
+                text: response.data.mensaje,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1900,
+              });
+            } else {
+              Swal.fire({
+                title: "Error",
+                text: "No se pudo Eliminar el medico",
+                icon: "error",
+                showConfirmButton: false,
+              });
+            }
           } catch (error) {
             Swal.fire("Error", "No se pudo eliminar", "error");
             console.error("Delete error:", error);
@@ -69,103 +84,13 @@ const ListMedicos = ({
         }
       });
     },
-    [refresh, urlApi],
-  );
-  const handleEdit = useCallback(
-    async (data) => {
-      if (typeof data === "object") {
-        const { id, ...formUpdate } = data;
-        const formData = new FormData();
-        Object.entries(formUpdate).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
-
-        try {
-          const response = await axios.put(
-            urlApi + "update/" + data.id,
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            },
-          );
-
-          if (response.data.estado === true) {
-            setRefresh(!refresh);
-            Swal.fire({
-              title: "Actualizado",
-              text: "El medicamento se ha actualizado",
-              icon: "success",
-              showConfirmButton: false,
-              timer: 1700,
-            });
-          } else {
-            Swal.fire({
-              title: "Error",
-              text: "No se pudo actualizar el medicamento",
-              icon: "error",
-              showConfirmButton: false,
-            });
-          }
-        } catch (error) {
-          Swal.fire("Error", "Ocurrió un problema", "error");
-          console.error("Update error:", error);
-        }
-      } else {
-        console.log("No es un Object :", data);
-      }
-    },
-    [refresh, urlApi],
+    [urlApi],
   );
 
-  const handleInsert = useCallback(
-    async (data) => {
-      if (typeof data === "object") {
-        try {
-          const response = await axios.put(urlApi + "create/", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-
-          if (response.data.estado === true) {
-            setRefresh(!refresh);
-            Swal.fire({
-              title: "Registrado",
-              text: "El Medico se ha registro con exito",
-              icon: "success",
-              showConfirmButton: false,
-              timer: 1700,
-            });
-          } else {
-            Swal.fire({
-              title: "Error",
-              text: response.data.mensaje,
-              icon: "error",
-              showConfirmButton: false,
-            });
-          }
-        } catch (error) {
-          Swal.fire("Error", "Ocurrió un problema", "error");
-          console.error("Insert error:", error);
-        }
-      } else {
-        console.log("No es un Object :", data);
-      }
-    },
-    [refresh, urlApi],
-  );
   const handleClose = () => {
     setOpen(false);
-    setMedicamentoSelect(null);
+    setdetalles(null);
   };
-  useEffect(() => {
-    if (staOrder) {
-      handleEdit(update);
-      setStateOrde(false);
-    }
-  }, [staOrder, update, handleEdit]);
 
   const renderPaginationControls = () => (
     <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -231,6 +156,76 @@ const ListMedicos = ({
   );
   return (
     <>
+      {detalles && (
+        <Dialog
+          open={open}
+          size="sm"
+          key={detalles.documento}
+          handler={handleClose}
+        >
+          <DialogHeader className="flex items-center gap-2">
+            Información General
+          </DialogHeader>
+          <DialogBody
+            divider
+            className="flex flex-col gap-3 text-sm text-gray-700"
+          >
+            <Typography>
+              <span className="font-semibold">Documento:</span>{" "}
+              {detalles.documento}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Nombre:</span>{" "}
+              {detalles.nombreMedico} {detalles.apellidoMedico}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Especialidad:</span>{" "}
+              {detalles.especialidad}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Email:</span>{" "}
+              {detalles.emailMedico}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Teléfono:</span>{" "}
+              {detalles.telefono}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Fecha de Nacimiento:</span>{" "}
+              {new Date(detalles.fechaNacimiento).toLocaleDateString()}
+            </Typography>
+          </DialogBody>
+        </Dialog>
+      )}
+      {detalles && (
+        <Dialog open={open2} size="lg" handler={handleClose}>
+          <DialogHeader className="flex items-center bg-gradient-to-r from-blue-600 to-blue-400 rounded-t-lg px-6 py-4 justify-center text-white">
+            <IconButton
+              size="sm"
+              variant="text"
+              className="!absolute right-3.5 top-3.7"
+              onClick={handleClose}
+            >
+              <XMarkIcon className="h-5 w-5 stroke-2" />
+            </IconButton>
+            <div className="flex flex-col items-center">
+              {/* <i className="fa-solid fa-user-doctor fa-2x mt-1"></i> */}
+              <i className="fa-solid fa-id-card-clip fa-2x mt-1"></i>
+              <span className="text-xl font-bold mt-4">
+                Actualizacion Medicos
+              </span>
+            </div>
+          </DialogHeader>
+          <DialogBody divider className="flex flex-col gap-4">
+            <FormUpdatMedico
+              dataForm={detalles}
+              setRefresh={onRefresh}
+              urlApi={urlApi}
+              stateModal={setOpen2}
+            />
+          </DialogBody>
+        </Dialog>
+      )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 mt-2">
         <div className="flex gap-4 mt-4">
           <div className="w-full">
@@ -305,7 +300,7 @@ const ListMedicos = ({
                       fontSize="14"
                       fontWeight="bold"
                     >
-                      L
+                      H
                     </text>
                   </svg>
                 </div>

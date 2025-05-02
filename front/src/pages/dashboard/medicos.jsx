@@ -2,20 +2,11 @@ import {
   Dialog,
   DialogHeader,
   DialogBody,
-  DialogFooter,
   Button,
-  Tab,
-  TabPanel,
-  Tabs,
-  TabsBody,
-  TabsHeader,
+  Tooltip,
+  IconButton,
 } from "@material-tailwind/react";
-import {
-  ArchiveBoxIcon,
-  ClipboardIcon,
-  PhoneIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/solid";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
 import ListMedicos from "@/components/medicos/ListMedicos";
@@ -23,6 +14,7 @@ import FormMedico from "@/components/medicos/FormMedico";
 export function Medicos() {
   const urlApi = "http://127.0.0.1:3000/api/medical/";
   const [open, setOpen] = useState(false);
+
   const [medicos, setMedicos] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,8 +32,7 @@ export function Medicos() {
   });
   /*   console.log(medicos);
   console.log(paginacion); */
-  console.log("refresco form: " + refresh);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => setOpen(!open);
 
   const handlePageChange = useCallback(
     async (target) => {
@@ -103,37 +94,45 @@ export function Medicos() {
     await handlePageChange(1);
   }, [handlePageChange]);
 
-  /*  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]); */
-
   useEffect(() => {
     fetchInitialData();
-  }, [fetchInitialData, refresh]);
+  }, [refresh, fetchInitialData]);
   return (
     <>
-      <Button onClick={handleOpen} variant="gradient">
-        Open Modal
-      </Button>
+      <Tooltip content="Registrar medico" placement="right">
+        <Button onClick={handleOpen} variant="gradient">
+          {" "}
+          <i className="fa-solid fa-user-plus"></i>
+        </Button>
+      </Tooltip>
+
       <Dialog open={open} handler={handleOpen} size="md">
         <DialogHeader className="flex items-center bg-gradient-to-r from-blue-600 to-blue-400 rounded-t-lg px-6 py-4 justify-center text-white">
           {" "}
           <div className="flex flex-col items-center">
-            <i className="material-icons text-4xl mb-2">icono</i>
-            <span className="text-xl font-bold">Registro de Medicos</span>
+            <i className="fa-solid fa-user-doctor fa-2x mt-1"></i>
+            <span className="text-xl font-bold mt-4">Registro Medicos</span>
           </div>
+          <IconButton
+            size="sm"
+            variant="text"
+            className="!absolute right-3.5 top-3.7"
+            onClick={handleOpen}
+          >
+            <XMarkIcon className="h-5 w-5 stroke-2" />
+          </IconButton>
         </DialogHeader>
         <DialogBody>
-          <FormMedico setRefresh={setRefresh} urlApi={urlApi}></FormMedico>
+          <FormMedico
+            setRefresh={setRefresh}
+            stateModal={setOpen}
+            urlApi={urlApi}
+          ></FormMedico>
         </DialogBody>
-        <DialogFooter>
-          <Button variant="gradient" color="gray" onClick={handleOpen}>
-            <span>Cerrar</span>
-          </Button>
-        </DialogFooter>
       </Dialog>
 
       <ListMedicos
+        urlApi={urlApi}
         medicos={medicos}
         loading={loading}
         error={error}
@@ -141,7 +140,7 @@ export function Medicos() {
         paginacion={paginacion}
         setBusqueda={setBusqueda}
         handlePageChange={handlePageChange}
-        urlApi={urlApi}
+        onRefresh={setRefresh}
       />
     </>
   );
