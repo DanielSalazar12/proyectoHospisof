@@ -67,6 +67,17 @@ export const deleteUser = async (id) => {
     }
 };
 
+export const deletePaciente = async (id) => {
+    try {
+        const response = await axios.post(`http://localhost:3000/api/patient/delet`, { id });
+        return response.data;
+    } catch (error) {
+        console.error("Error al eliminar usuario:", error);
+        throw error;
+    }
+};
+
+
 export const epsList = [
     { id: "1", nombre: "Sura" },
     { id: "2", nombre: "Sanitas" },

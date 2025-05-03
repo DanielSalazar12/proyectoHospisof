@@ -36,6 +36,9 @@ export const add = async (data) => {
       fechaNacimiento: data.fecha,
       epsPaciente: data.eps,
       idUsuario: new Types.ObjectId(data.idUsuario),
+      estadoCivil: data.estadoCivil,
+      sexo: data.sexo,
+      direccion: data.direccion,
       status: 1,
     });
     await patientNuevo.save();

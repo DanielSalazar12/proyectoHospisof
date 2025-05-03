@@ -49,6 +49,9 @@ router.post(
       telefono: Joi.number().required(),
       eps: Joi.string().required(),
       idUsuario: Joi.string().hex().length(24).required(),
+      estadoCivil: Joi.string().required(),
+      sexo: Joi.string().required(),
+      direccion: Joi.string().required(),
     }),
   }),
   async (req, res) => {

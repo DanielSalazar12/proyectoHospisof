@@ -27,6 +27,18 @@ const patientSchema = new Schema(
       ref: "Usuario",
       required: true,
     },
+    estadoCivil: {
+      type: String,
+      required: true,
+    },
+    sexo: {
+      type: String,
+      required: true,
+    },
+    direccion: {
+      type: String,
+      required: true,
+    },
     status: {
       type: Number,
       required: true,
