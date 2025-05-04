@@ -5,9 +5,19 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  HeartIcon,
+  ClipboardIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+
+import {
+  Home,
+  Profile,
+  Medicamentos,
+  Medicos,
+} from "@/pages/dashboard"; //importamos los componentes de las paginas
+
 import { SignIn, SignUp } from "@/pages/auth";
+import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -25,21 +35,21 @@ export const routes = [
       },
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
+        name: "diagnostico",
+        path: "/diagnostico",
         element: <Profile />,
       },
       {
         icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
-        element: <Tables />,
+        name: "medicamentos",
+        path: "/medicamentos",
+        element: <Medicamentos />,
       },
       {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
+        icon: <ClipboardDocumentIcon {...icon} />,
+        name: "medicos",
+        path: "/medicos",
+        element: <Medicos />,
       },
     ],
   },

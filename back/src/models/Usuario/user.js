@@ -1,19 +1,27 @@
-
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 const usuarioSchema = new Schema(
   {
-    nombre: {
+    nombreUser: {
       type: String,
-      required: true,
+      required: true
     },
-    email: {
+    passwordUser: {
       type: String,
-      required: true,
+      required: true
     },
-    passwordHash: {
+    emailUser: {
       type: String,
-      required: true,
+      required: true
     },
+    rol: {
+      type: Types.ObjectId, // Esto es para la foranea de roles
+      ref: "Roles",
+      required: true
+    },
+    status: {
+      type: Number,
+      required: true
+    }
   },
   { collection: "users" }
 );

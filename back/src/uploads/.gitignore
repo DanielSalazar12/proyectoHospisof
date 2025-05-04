@@ -1,1 +1,9 @@
+<<<<<<< HEAD
 /medicamentos/*
+=======
+
+/medicamentos/
+/medicamentos/!note.txt
+
+!gitignore
+>>>>>>> Yusti

@@ -57,7 +57,7 @@ export function Configurator() {
 
   React.useEffect(() => {
     const stars = fetch(
-      "https://api.github.com/repos/creativetimofficial/material-tailwind-dashboard-react"
+      "https://api.github.com/repos/creativetimofficial/material-tailwind-dashboard-react",
     )
       .then((response) => response.json())
       .then((data) => setStars(formatNumber(data.stargazers_count, 1)));
@@ -211,17 +211,11 @@ export function Configurator() {
             Thank you for sharing ❤️
           </Typography>
           <div className="mt-4 flex justify-center gap-2">
-            <Button
-              variant="gradient"
-              className="flex items-center gap-2"
-            >
+            <Button variant="gradient" className="flex items-center gap-2">
               <i className="fa-brands fa-twitter text-white" />
               Tweet
             </Button>
-            <Button
-              variant="gradient"
-              className="flex items-center gap-2"
-            >
+            <Button variant="gradient" className="flex items-center gap-2">
               <i className="fa-brands fa-facebook text-white" />
               Share
             </Button>
