@@ -237,36 +237,7 @@ const ListMedicos = ({
             />
           </div>
         </div>
-        {/*   <div className="flex gap-4 mt-4">
-          <div className="w-full">
-            <div className="mb-3 flex gap-3">
-              <Tooltip
-                content="Filtrar"
-                animate={{
-                  mount: { scale: 1, y: 0 },
-                  unmount: { scale: 0, y: 25 },
-                }}
-                placement="top"
-              >
-                <Menu placement="right">
-                  <MenuHandler>
-                    <IconButton color="amber">
-                      <i className="fa-solid fa-filter"></i>
-                    </IconButton>
-                  </MenuHandler>
-                  <MenuList>
-                    <MenuItem>
-                      <i className="fa-solid fa-arrow-up-a-z"></i>
-                    </MenuItem>
-                    <MenuItem>
-                      <i className="fa-solid fa-arrow-down-z-a"></i>
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Tooltip>
-            </div>
-          </div>
-        </div> */}
+        
       </div>
       {loading && <Typography>Cargando medicos...</Typography>}
       {error && <Typography color="red">{error}</Typography>}

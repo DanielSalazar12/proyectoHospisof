@@ -12,7 +12,6 @@ import {
 import {
   Home,
   Profile,
-  Notifications,
   Medicamentos,
   Medicos,
 } from "@/pages/dashboard"; //importamos los componentes de las paginas
@@ -36,8 +35,8 @@ export const routes = [
       },
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
+        name: "diagnostico",
+        path: "/diagnostico",
         element: <Profile />,
       },
       {
@@ -51,12 +50,6 @@ export const routes = [
         name: "medicos",
         path: "/medicos",
         element: <Medicos />,
-      },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
       },
     ],
   },
