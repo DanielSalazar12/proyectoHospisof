@@ -76,16 +76,12 @@ const actualizarPorId = async (req, res) => {
   let id = req.params.id;
 
   let datos = {
-    nombre: req.body.nombre,
-    apellido: req.body.apellido,
-    email: req.body.email,
-    telefono: req.body.telefono,
-    especialidad: req.body.especialidad,
-    rol: req.body.rol,
-    userName: req.body.userName,
+    nombreUsuario: req.body.nombreUsuario,
     passwordUser: req.body.passwordUser,
+    emailUser: req.body.emailUser,
+    rol: req.body.rol,
+    status: req.body.status || 1,
   };
-
   try {
     let consulta = await Usuarios.findByIdAndUpdate(id, datos).exec();
     return res.send({

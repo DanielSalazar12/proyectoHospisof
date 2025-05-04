@@ -62,8 +62,7 @@ export const updatePatient = async (data) => {
     emailPaciente: data.email,
     telefonoPaciente: data.telefono,
     fechaNacimiento: data.fecha,
-    epsPaciente: data.eps,
-    idUsuario: new Types.ObjectId(data.idUsuario),
+    epsPaciente: data.eps
   };
   try {
     let patientUpdate = await Patients.findByIdAndUpdate(id, info);
@@ -83,7 +82,8 @@ export const updatePatient = async (data) => {
 export const searchById = async (data) => {
   let id = data.id;
   try {
-    let result = await Patients.findById(id).exec();
+    let result = await Patients.findById(id).populate("idUsuario").exec();
+
     return {
       estado: true,
       mensaje: "Consulta Exitosa",
@@ -96,6 +96,7 @@ export const searchById = async (data) => {
     };
   }
 };
+
 export const deleteById = async (data) => {
   let id = data.id;
   try {

@@ -47,6 +47,17 @@ export const updatePaciente = async (id, formData) => {
         throw error;
     }
 };
+export const updateUser = async (id, formData) => {
+    try {
+        console.log("Enviando update a:", `http://localhost:3000/api/usuario/actualizar/${id}`);
+        const response = await axios.put(`http://localhost:3000/api/usuario/actualizar/${id}`, formData);
+        return response.data;
+    } catch (error) {
+        console.error("Error en updateUser:", error);
+        throw error;
+    }
+};
+
 export const getUserId = async (id) => {
     try {
         const res = await axios.get(`http://localhost:3000/api/usuario/listarPorId/${id}`);
@@ -56,6 +67,22 @@ export const getUserId = async (id) => {
         return [];
     }
 };
+
+export const getPacienteId = async (id) => {
+    try {
+        const res = await axios.get(`http://localhost:3000/api/patient/${id}`);
+
+        if (!res.data || !res.data.result) {
+            throw new Error("Paciente no encontrado");
+        }
+
+        return res.data.result;
+    } catch (err) {
+        console.error("Error al cargar el paciente por ID:", err);
+        throw err; // permite que el hook capture el error correctamente
+    }
+};
+
 
 export const deleteUser = async (id) => {
     try {

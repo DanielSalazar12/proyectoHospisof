@@ -11,6 +11,8 @@ export default function PacientesForm({
     abrirModalUsuarios,
     roles,
     epsList,
+    modoEdicion,
+    handleUpdate
 }) {
     return (
         <Dialog open={open} handler={abrirModalUsuarios}>
@@ -42,13 +44,32 @@ export default function PacientesForm({
 
                 <Input label="Dirección" name="direccion" value={formData.direccion} onChange={handleChange} />
                 <Input label="Estado civil" name="estadoCivil" value={formData.estadoCivil} onChange={handleChange} />
-                <Input label="Nombre de usuario" name="userName" value={formData.userName} onChange={handleChange} />
-                <Input label="Contraseña" type="password" name="passwordUser" value={formData.passwordUser} onChange={handleChange} />
+                {!modoEdicion && (
+                    <>
+                        <Input
+                            label="Nombre de Usuario"
+                            name="userName"
+                            value={formData.userName}
+                            onChange={handleChange}
+                        />
+                        <Input
+                            label="Contraseña"
+                            name="passwordUser"
+                            type="password"
+                            value={formData.passwordUser}
+                            onChange={handleChange}
+                        />
+                    </>
+                )}
+
             </DialogBody>
 
             <DialogFooter>
                 <Button variant="text" color="red" onClick={abrirModalUsuarios} className="mr-2">Cancelar</Button>
-                <Button variant="gradient" color="green" onClick={handleSubmit}>Guardar</Button>
+                <Button onClick={modoEdicion ? handleUpdate : handleSubmit} color="green">
+                    {modoEdicion ? "Actualizar" : "Registrar"}
+                </Button>
+
             </DialogFooter>
         </Dialog>
     );

@@ -1,6 +1,5 @@
 // src/hooks/usePacientesLogic.js
 import { useState, useEffect } from "react";
-
 import Swal from "sweetalert2";
 import {
     fetchPacientes,
@@ -9,6 +8,9 @@ import {
     fetchRoles,
     deleteUser,
     deletePaciente,
+    getPacienteId,
+    updatePaciente,
+    updateUser,
 } from "@/hooks/usePacientesData";
 
 const initialForm = {
@@ -31,8 +33,21 @@ export function usePacientesLogic() {
     const [roles, setRoles] = useState([]);
     const [formData, setFormData] = useState(initialForm);
     const [open, setOpen] = useState(false);
+    const [modoEdicion, setModoEdicion] = useState(false);
+    const [idPacienteActual, setIdPacienteActual] = useState(null);
+    const [idUsuarioActual, setIdUsuarioActual] = useState(null);
 
-    const abrirModalUsuarios = () => setOpen(!open);
+    const abrirModalUsuarios = () => {
+        if (open) {
+            // Si se está cerrando la modal, reseteamos todo
+            setFormData(initialForm);
+            setModoEdicion(false);
+            setIdPacienteActual(null);
+            setIdUsuarioActual(null);
+        }
+        setOpen(!open);
+    };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,8 +56,10 @@ export function usePacientesLogic() {
 
     const cargarDatos = async () => {
         try {
-            const pacientesData = await fetchPacientes();
-            const rolesData = await fetchRoles();
+            const [pacientesData, rolesData] = await Promise.all([
+                fetchPacientes(),
+                fetchRoles(),
+            ]);
             setPacientes(pacientesData);
             setRoles(rolesData);
         } catch (error) {
@@ -54,8 +71,52 @@ export function usePacientesLogic() {
         cargarDatos();
     }, []);
 
+    const handleEditClick = async (id) => {
+        try {
+            const paciente = await getPacienteId(id);
+
+            setFormData({
+                nombre: paciente.nombrePaciente || "",
+                documento: paciente.documento || "",
+                email: paciente.idUsuario?.emailUser || "",
+                telefono: paciente.telefonoPaciente || "",
+                fechaNacimiento: paciente.fechaNacimiento || "",
+                eps: paciente.epsPaciente || "",
+                userName: paciente.idUsuario?.nombreUsuario || "",
+                passwordUser: paciente.idUsuario?.passwordUser || "",
+                rol: paciente.idUsuario?.rol || "",
+                estadoCivil: paciente.estadoCivil || "",
+                sexo: paciente.sexo || "",
+                direccion: paciente.direccion || "",
+            });
+
+            setIdPacienteActual(paciente._id);
+            setIdUsuarioActual(paciente.idUsuario?._id);
+            setModoEdicion(true);
+            setOpen(true);
+        } catch (error) {
+            console.error("Error al cargar paciente:", error);
+            Swal.fire("Error", "No se pudo cargar el paciente", "error");
+        }
+    };
+
+
+    // ----------------------------------------------------Insercion doble y manejador de submit-------------------------
     const handleSubmit = async () => {
-        if (!formData.nombre || !formData.documento || !formData.telefono || !formData.email || !formData.fechaNacimiento || !formData.eps || !formData.userName || !formData.passwordUser) {
+        const camposRequeridos = [
+            "nombre",
+            "documento",
+            "telefono",
+            "email",
+            "fechaNacimiento",
+            "eps",
+            "userName",
+            "passwordUser"
+        ];
+
+        const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+
+        if (camposVacios.length > 0) {
             Swal.fire({
                 icon: "error",
                 title: "Campos incompletos",
@@ -75,7 +136,7 @@ export function usePacientesLogic() {
 
             const usuarioCreado = await createUser(nuevoUsuario);
 
-            if (!usuarioCreado || !usuarioCreado.usuario._id) {
+            if (!usuarioCreado?.usuario?._id) {
                 Swal.fire({
                     icon: "error",
                     title: "Error al crear usuario",
@@ -118,6 +179,76 @@ export function usePacientesLogic() {
         }
     };
 
+
+
+    // -----------------------------------------------Editar-----------------------------------------------------------------
+
+    const handleUpdate = async () => {
+        const camposRequeridos = [
+            "nombre",
+            "documento",
+            "telefono",
+            "email",
+            "fechaNacimiento",
+            "eps"
+        ];
+
+        const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+
+        if (camposVacios.length > 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Campos incompletos",
+                text: "Por favor, completa todos los campos antes de continuar.",
+            });
+            return;
+        }
+
+        try {
+            const usuarioActualizado = {
+                nombreUsuario: formData.userName,
+                passwordUser: formData.passwordUser,
+                emailUser: formData.email,
+                rol: formData.rol,
+                status: 1,
+            };
+
+            await updateUser(idUsuarioActual, usuarioActualizado);
+
+            const pacienteActualizado = {
+                id: idPacienteActual,
+                nombre: formData.nombre,
+                fecha: formData.fechaNacimiento,
+                documento: Number(formData.documento),
+                telefono: Number(formData.telefono),
+                eps: formData.eps,
+                estadoCivil: formData.estadoCivil,
+                sexo: formData.sexo,
+                direccion: formData.direccion,
+            };
+
+            await updatePaciente(idPacienteActual, pacienteActualizado);
+
+            Swal.fire({
+                icon: "success",
+                title: "Paciente actualizado",
+                text: "Los datos fueron actualizados exitosamente.",
+            });
+
+            abrirModalUsuarios();
+            setFormData(initialForm);
+            setModoEdicion(false);
+            await cargarDatos();
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo actualizar el paciente.",
+            });
+        }
+    };
+
     const handleDelete = async (idPaciente) => {
         const result = await Swal.fire({
             title: "¿Estás seguro?",
@@ -131,9 +262,12 @@ export function usePacientesLogic() {
         if (result.isConfirmed) {
             try {
                 const pacienteEliminado = await deletePaciente(idPaciente);
-                const idUsuario = pacienteEliminado.result.idUsuario;
+                const idUsuario = pacienteEliminado?.result?.idUsuario;
 
-                await deleteUser(idUsuario);
+                if (idUsuario) {
+                    await deleteUser(idUsuario);
+                }
+
                 await cargarDatos();
 
                 Swal.fire({
@@ -158,8 +292,13 @@ export function usePacientesLogic() {
         formData,
         handleChange,
         handleSubmit,
+        handleEditClick,
+        handleUpdate,
         pacientes,
         roles,
         handleDelete,
+        modoEdicion,
+        idPacienteActual,
+        idUsuarioActual,
     };
 }
