@@ -1,35 +1,49 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 const patientSchema = new Schema(
   {
     nombrePaciente: {
       type: String,
-      required: true,
+      required: true
     },
     documento: {
       type: Number,
-      required: true,
-    },
-    emailPaciente: {
-      type: String,
-      required: true,
+      required: true
     },
     telefonoPaciente: {
       type: Number,
-      required: true,
+      required: true
     },
     fechaNacimiento: {
       type: Date,
-      required: true,
+      required: true
     },
     epsPaciente: {
       type: String,
-      required: true,
+      required: true
+    },
+    idUsuario: {
+      type: Types.ObjectId, // Esto es para la foránea de Usuarios
+      ref: "Usuario",
+      required: true
+    },
+    estadoCivil: {
+      type: String,
+      required: true
+    },
+    sexo: {
+      type: String,
+      required: true
+    },
+    direccion: {
+      type: String,
+      required: true
     },
     status: {
       type: Number,
-      required: true,
-    },
+      required: true
+    }
   },
   { collection: "pacientes" }
 );
+
 export default model("Patients", patientSchema);
