@@ -16,7 +16,7 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                 <table className="w-full min-w-[640px] table-auto">
                     <thead>
                         <tr>
-                            {["Nombre", "Función", "Status", "Contacto", "EPS", ""].map((el) => (
+                            {["Nombre", "Función", "Status", "Contacto", "EPS", "Acciones"].map((el) => (
                                 <th key={el} className="border-b border-blue-gray-50 py-3 px-5 text-left">
                                     <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">{el}</Typography>
                                 </th>

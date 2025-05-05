@@ -6,6 +6,7 @@ const router = express.Router();
 // Rutas que entrega la API
 router.get("/usuario/listartodos", usuarioController.listarTodos);
 router.get("/usuario/listarPorId/:id", usuarioController.buscarPorId);
+router.get("/usuario/listarPorIdUser/:id", usuarioController.buscarPorIdUser);
 router.post("/usuario/nuevo", usuarioController.nuevo);
 router.put("/usuario/actualizar/:id", usuarioController.actualizarPorId);
 router.delete("/usuario/eliminar/:id", usuarioController.eliminarPorId);

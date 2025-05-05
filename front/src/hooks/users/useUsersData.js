@@ -11,6 +11,17 @@ export const fetchUsers = async () => {
     }
 };
 
+export const fetchValidacionDelete = async (idUser) => {
+    try {
+        const res = await axios.get(`http://localhost:3000/api/usuario/listarPorIdUser/${idUser}`);
+        return res.data.relacionado ? res.data.paciente : null; // Retorna el paciente si está relacionado
+    } catch (err) {
+        console.error("Error :", err);
+        return null;
+    }
+};
+
+
 export const fetchRoles = async () => {
     try {
         const res = await axios.get("http://localhost:3000/api/roles/listarTodos");

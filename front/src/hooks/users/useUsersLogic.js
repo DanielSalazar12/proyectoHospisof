@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-import { fetchUsers, fetchRoles, deleteUser } from "@/hooks/users/useUsersData";
+import { fetchUsers, fetchRoles, deleteUser, fetchValidacionDelete } from "@/hooks/users/useUsersData";
+
+import { getPacienteId, deletePaciente } from "@/hooks/usePacientesData";
 
 const initialForm = {
     nombreUsuario: "",
@@ -64,6 +66,15 @@ export const useUsersLogic = () => {
 
         if (result.isConfirmed) {
             try {
+
+                const pacienteRelacionado = await fetchValidacionDelete(idUser);
+
+                if (pacienteRelacionado) {
+
+                    await deletePaciente(pacienteRelacionado._id);
+                }
+
+
                 await deleteUser(idUser);
                 await cargarDatos();
 
@@ -82,6 +93,7 @@ export const useUsersLogic = () => {
             }
         }
     };
+
 
     return {
         open,
