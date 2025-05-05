@@ -12,6 +12,7 @@ export default function Users() {
         users,
         roles,
         handleChange,
+        handleDelete,
     } = useUsersLogic();
 
 
@@ -33,6 +34,7 @@ export default function Users() {
             <UsersTable
                 users={users}
                 roles={roles}
+                handleDelete={handleDelete}
             />
 
 

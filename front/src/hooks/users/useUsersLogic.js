@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-import { fetchUsers, fetchRoles } from "@/hooks/users/useUsersData";
+import { fetchUsers, fetchRoles, deleteUser } from "@/hooks/users/useUsersData";
 
 const initialForm = {
     nombreUsuario: "",
@@ -51,6 +51,38 @@ export const useUsersLogic = () => {
 
 
 
+
+    const handleDelete = async (idUser) => {
+        const result = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esto eliminará el usuario.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteUser(idUser);
+                await cargarDatos();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Usuario eliminado",
+                    text: "El usuario fue eliminado correctamente.",
+                });
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "No se pudo eliminar el usuario.",
+                });
+            }
+        }
+    };
+
     return {
         open,
         abrirModalUsers,
@@ -58,6 +90,7 @@ export const useUsersLogic = () => {
         users,
         roles,
         handleChange,
+        handleDelete,
     }
 
 };

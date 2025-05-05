@@ -5,7 +5,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
 
-export default function UsersTable({ users, roles }) {
+export default function UsersTable({ users, roles, handleDelete }) {
     return (
         <Card>
             <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
@@ -69,14 +69,14 @@ export default function UsersTable({ users, roles }) {
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.95, rotate: -5 }}
                                                     className="text-blue-500 hover:text-blue-700"
-                                                    onClick={() => handleEditClick(paciente._id)} // Llama a handleEditClick para cargar los datos
+                                                    onClick={() => handleEditClick(user._id)} // Llama a handleEditClick para cargar los datos
                                                 >
                                                     <PencilIcon className="h-5 w-5" />
                                                 </motion.button>
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.95, rotate: -5 }}
-                                                    onClick={() => handleDelete(paciente._id)}
+                                                    onClick={() => handleDelete(user._id)}
                                                     className="text-red-500 hover:text-red-700"
                                                 >
                                                     <TrashIcon className="h-5 w-5" />
