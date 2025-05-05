@@ -18,7 +18,7 @@ export default function PacientesForm({
         <Dialog open={open} handler={abrirModalUsuarios}>
             <DialogHeader>Registrar nuevo usuario</DialogHeader>
             <DialogBody className="flex flex-col gap-4">
-                <Input label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
+                <Input label="Nombre completo" name="nombre" value={formData.nombre} onChange={handleChange} />
                 <Input label="Documento" type="number" name="documento" value={formData.documento} onChange={handleChange} />
                 <Input label="Email" type="email" name="email" value={formData.email} onChange={handleChange} />
                 <Input label="Telefono" type="number" name="telefono" value={formData.telefono} onChange={handleChange} />
@@ -43,7 +43,21 @@ export default function PacientesForm({
                 </Select>
 
                 <Input label="Dirección" name="direccion" value={formData.direccion} onChange={handleChange} />
-                <Input label="Estado civil" name="estadoCivil" value={formData.estadoCivil} onChange={handleChange} />
+
+                <Select
+                    label="Estado Civil"
+                    name="estadoCivil"
+                    value={formData.estadoCivil}
+                    onChange={(val) => handleChange({ target: { name: "estadoCivil", value: val } })}
+                >
+                    <Option value="soltero">Soltero</Option>
+                    <Option value="casado">Casado</Option>
+                    <Option value="unionLibre">Unión Libre</Option>
+                    <Option value="divorciado">Divorciado</Option>
+                    <Option value="viudo">Viudo</Option>
+                </Select>
+
+
                 {!modoEdicion && (
                     <>
                         <Input

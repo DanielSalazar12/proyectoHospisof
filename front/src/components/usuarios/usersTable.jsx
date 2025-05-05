@@ -3,10 +3,9 @@ import {
 } from "@material-tailwind/react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-import { epsList } from "@/hooks/usePacientesData";
 
 
-export default function PacientesTable({ pacientes, roles, handleDelete, handleEditClick }) {
+export default function UsersTable({ users, roles }) {
     return (
         <Card>
             <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
@@ -16,7 +15,7 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                 <table className="w-full min-w-[640px] table-auto">
                     <thead>
                         <tr>
-                            {["Nombre", "Función", "Status", "Contacto", "EPS", ""].map((el) => (
+                            {["Nombre usuario", "Rol", "Status", ""].map((el) => (
                                 <th key={el} className="border-b border-blue-gray-50 py-3 px-5 text-left">
                                     <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">{el}</Typography>
                                 </th>
@@ -24,30 +23,30 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                         </tr>
                     </thead>
                     <tbody>
-                        {pacientes.length === 0 ? (
+                        {users.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="text-center py-4">
-                                    <Typography variant="small" color="blue-gray">Cargando pacientes...</Typography>
+                                    <Typography variant="small" color="blue-gray">Cargando Usarios...</Typography>
                                 </td>
                             </tr>
                         ) : (
-                            pacientes.map((paciente, key) => {
-                                const className = `py-3 px-5 ${key === pacientes.length - 1 ? "" : "border-b border-blue-gray-50"}`;
+                            users.map((user, key) => {
+                                const className = `py-3 px-5 ${key === users.length - 1 ? "" : "border-b border-blue-gray-50"}`;
                                 return (
-                                    <tr key={paciente._id}>
+                                    <tr key={user._id}>
                                         <td className={className}>
                                             <div className="flex items-center gap-4">
                                                 <Avatar
                                                     src="https://png.pngtree.com/png-clipart/20190516/original/pngtree-users-vector-icon-png-image_3725294.jpg"
-                                                    alt={paciente.nombrePaciente}
+                                                    alt={user.nombreUsuario}
                                                     size="sm"
                                                     variant="rounded"
                                                 />
                                                 <div>
-                                                    <Typography variant="small" color="blue-gray" className="font-semibold">{paciente.nombrePaciente}</Typography>
+                                                    <Typography variant="small" color="blue-gray" className="font-semibold">{user.nombreUsuario}</Typography>
                                                     <Typography className="text-xs font-normal text-blue-gray-500">
-                                                        <a href={`mailto:${paciente.idUsuario?.emailUser}`} className="text-blue-500 underline">
-                                                            {paciente.idUsuario?.emailUser || 'Sin correo'}
+                                                        <a className="text-blue-500 underline">
+                                                            {user?.emailUser || 'Sin correo'}
                                                         </a>
                                                     </Typography>
                                                 </div>
@@ -55,22 +54,13 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                                         </td>
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {roles.find(r => r._id === paciente.idUsuario?.rol)?.nombreRol || 'Sin rol'}
+                                                {roles.find(r => r._id === user.rol)?.nombreRol || 'Sin rol'}
                                             </Typography>
                                         </td>
                                         <td className={className}>
-                                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${paciente.status === 1 ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
-                                                {paciente.status === 1 ? "Activo" : "Inactivo"}
+                                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${user.status === 1 ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                                                {user.status === 1 ? "Activo" : "Inactivo"}
                                             </span>
-                                        </td>
-                                        <td className={className}>
-                                            <Typography className="text-xs font-normal text-blue-gray-500">{paciente.telefonoPaciente}</Typography>
-                                        </td>
-                                        <td>
-                                            <Typography className="text-xs font-normal text-blue-gray-500">
-                                                {epsList.find(eps => eps.id === paciente.epsPaciente)?.nombre || "Sin EPS"}
-                                            </Typography>
-
                                         </td>
 
                                         <td className={className}>

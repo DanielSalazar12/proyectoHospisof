@@ -80,7 +80,9 @@ export function usePacientesLogic() {
                 documento: paciente.documento || "",
                 email: paciente.idUsuario?.emailUser || "",
                 telefono: paciente.telefonoPaciente || "",
-                fechaNacimiento: paciente.fechaNacimiento || "",
+                fechaNacimiento: paciente.fechaNacimiento
+                    ? new Date(paciente.fechaNacimiento).toISOString().split("T")[0]
+                    : "",                                                             // Convercion para que me convierta la fecha y me la traiga
                 eps: paciente.epsPaciente || "",
                 userName: paciente.idUsuario?.nombreUsuario || "",
                 passwordUser: paciente.idUsuario?.passwordUser || "",
@@ -89,6 +91,7 @@ export function usePacientesLogic() {
                 sexo: paciente.sexo || "",
                 direccion: paciente.direccion || "",
             });
+
 
             setIdPacienteActual(paciente._id);
             setIdUsuarioActual(paciente.idUsuario?._id);

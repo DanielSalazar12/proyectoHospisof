@@ -5,8 +5,13 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  UserIcon,
+  UsersIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import { Home, Profile, Tables, Users, Notifications } from "@/pages/dashboard";
+//import Usuarios from "@/pages/dashboard/users";
+//import Pacientes from "@/pages/dashboard/Pacientes";
+
 import { SignIn, SignUp } from "@/pages/auth";
 
 const icon = {
@@ -30,13 +35,13 @@ export const routes = [
         element: <Profile />,
       },
       {
-        icon: <TableCellsIcon {...icon} />,
+        icon: <UserIcon {...icon} />,
         name: "Usuarios",
         path: "/usuarios",
-        element: <Tables />,
+        element: <Users />,
       },
       {
-        icon: <TableCellsIcon {...icon} />,
+        icon: <UsersIcon {...icon} />,
         name: "Pacientes",
         path: "/pacientes",
         element: <Tables />,

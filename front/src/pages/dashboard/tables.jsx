@@ -2,9 +2,9 @@ import { usePacientesLogic } from "@/hooks/usePacientesLogic";
 import PacientesForm from "@/components/pacientes/addform";
 import PacientesTable from "@/components/pacientes/pacientesTable";
 import { Button } from "@material-tailwind/react";
-import { epsList, getPacienteId } from "@/hooks/usePacientesData";
+import { epsList } from "@/hooks/usePacientesData";
 
-export function Tables() {
+export default function Tables() {
   const {
     open,
     abrirModalUsuarios,
@@ -44,6 +44,7 @@ export function Tables() {
         roles={roles}
         handleDelete={handleDelete}
         handleEditClick={handleEditClick}
+        epsList={epsList}
       />
     </div>
   );
