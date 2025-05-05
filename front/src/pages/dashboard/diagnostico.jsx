@@ -88,14 +88,14 @@ export function Diagnostico() {
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
+
   const handleBusqueda = (e) => {
     const value = e.target.value;
     setBusqueda(value);
     setResultados(
       pacientes.filter(
-        (p) =>
-          p.nombre.toLowerCase().includes(value.toLowerCase()) ||
-          p.cedula.includes(value),
+        (p) => p.nombre.toLowerCase().includes(value.toLowerCase()) /* ||
+          p.documento.includes(value), */,
       ),
     );
   };
@@ -131,7 +131,7 @@ export function Diagnostico() {
                 <div className="flex items-center gap-2">
                   <IdentificationIcon className="h-4 w-4 text-blue-500" />
                   <span>
-                    <strong>ID:</strong> {paciente.cedula}
+                    <strong>ID:</strong> {paciente.documento}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -143,13 +143,13 @@ export function Diagnostico() {
                 <div className="flex items-center gap-2">
                   <CalendarDaysIcon className="h-4 w-4 text-blue-500" />
                   <span>
-                    <strong>F. Nacimiento:</strong> {paciente.nacimiento}
+                    <strong>F. Nacimiento:</strong> {paciente.fecha}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <EnvelopeIcon className="h-4 w-4 text-blue-500" />
                   <span>
-                    <strong>Email:</strong> {paciente.email}
+                    <strong>Sexo:</strong> {paciente.sexo}
                   </span>
                 </div>
               </div>
@@ -258,13 +258,13 @@ export function Diagnostico() {
                         color="blue-gray"
                         className="mb-1"
                       >
-                        Richard Davis
+                        {paciente.nombre}
                       </Typography>
                       <Typography
                         variant="small"
                         className="font-normal text-blue-gray-600"
                       >
-                        CEO / Co-Founder
+                        Paciente / {paciente.eps}
                       </Typography>
                     </div>
                   </div>
@@ -310,11 +310,11 @@ export function Diagnostico() {
                         <List className="absolute z-10 w-full bg-white shadow-lg rounded-b-lg max-h-48 overflow-auto">
                           {resultados.map((p) => (
                             <ListItem
-                              key={p.cedula}
+                              key={p.documento}
                               onClick={() => handleSeleccion(p)}
                               className="cursor-pointer"
                             >
-                              {p.nombre} — {p.cedula}
+                              {p.nombre} — {p.documento}
                             </ListItem>
                           ))}
                         </List>
@@ -333,13 +333,13 @@ export function Diagnostico() {
                   <ProfileInfoCard
                     title="Informacion del paciente"
                     details={{
-                      Nombre: "Felipe Yusti Mosquera",
-                      Documento: "1113858419",
-                      Sexo: "Masculino",
-                      "Estado Civil": "Casado",
-                      "Fecha Nacimiento": "2004/03/25",
-                      EPS: "Sanitas",
-                      Telefono: "(44) 123 1234 123",
+                      Nombre: paciente.nombre,
+                      Documento: paciente.documento,
+                      Sexo: paciente.sexo,
+                      "Estado Civil": paciente.estadoCivil,
+                      "Fecha Nacimiento": paciente.fecha,
+                      EPS: paciente.eps,
+                      Telefono: paciente.telefono,
                       email: "elvergas@mail.com",
                     }}
                     action={

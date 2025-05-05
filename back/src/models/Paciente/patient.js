@@ -1,4 +1,5 @@
-import { Schema, Types, model } from "mongoose";
+import { Schema, model, Types } from "mongoose"; // Importa Types aquí
+
 const patientSchema = new Schema(
   {
     nombrePaciente: {
@@ -21,20 +22,20 @@ const patientSchema = new Schema(
       type: String,
       required: true
     },
+    sexo: {
+      type: String,
+      required: true
+    },
+    direccion: {
+      type: String,
+      required: true
+    },
     idUsuario: {
       type: Types.ObjectId, // Esto es para la foránea de Usuarios
       ref: "Usuario",
       required: true
     },
     estadoCivil: {
-      type: String,
-      required: true
-    },
-    sexo: {
-      type: String,
-      required: true
-    },
-    direccion: {
       type: String,
       required: true
     },

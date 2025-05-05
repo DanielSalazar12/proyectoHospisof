@@ -10,43 +10,46 @@ const listarTodos = async (req, res) => {
     const listarUsuarios = await Usuarios.find().exec();
     res.status(200).send({
       exito: true,
-      listarUsuarios
+      listarUsuarios,
     });
   } catch (error) {
     res.status(500).send({
       exito: false,
-      mensaje: "Error en la consulta"
+      mensaje: "Error en la consulta",
     });
   }
 };
 
 const nuevo = async (req, res) => {
   let datos = {
-    nombreUser: req.body.nombre,
-    passwordUser: req.body.apellido,
-    emailUser: req.body.email,
-    status: 1
+    nombreUsuario: req.body.nombreUsuario,
+    passwordUser: req.body.passwordUser,
+    emailUser: req.body.emailUser,
+    rol: req.body.rol,
+    status: req.body.status || 1,
   };
 
   try {
     const usuarioNuevo = new Usuarios(datos);
-
-    usuarioNuevo.save(); //Escribe el mongo
+    await usuarioNuevo.save();
 
     return res.send({
       estado: true,
-      mensaje: `Insercion exitosa`
+      mensaje: "Inserción exitosa",
+      usuario: usuarioNuevo,
     });
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `A ocurrido un error en la consulta ${error}`
+      mensaje: `Ha ocurrido un error en la consulta: ${error}`,
     });
   }
 };
 
+
 const buscarPorId = async (req, res) => {
   let id = req.params.id;
+
   try {
     //Logica de buscar  mostrar el resultado
     //let consulta = await producto.find(id).exec();
@@ -55,12 +58,12 @@ const buscarPorId = async (req, res) => {
     return res.send({
       estado: true,
       mensaje: `Busqueda exitosa`,
-      consulta: consulta
+      consulta: consulta,
     });
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `Error, no se pudo realizar la consulta`
+      mensaje: `Error, no se pudo realizar la consulta`,
     });
   }
 };
@@ -69,27 +72,28 @@ const buscarPorId = async (req, res) => {
 
 const actualizarPorId = async (req, res) => {
   //Recibe el parametro de la consulta
+
   let id = req.params.id;
 
   let datos = {
-    nombreUser: req.body.nombre,
-    passwordUser: req.body.apellido,
-    emailUser: req.body.email,
-    rol: req.body.rol
+    nombreUsuario: req.body.nombreUsuario,
+    passwordUser: req.body.passwordUser,
+    emailUser: req.body.emailUser,
+    rol: req.body.rol,
+    status: req.body.status || 1,
   };
-
   try {
     let consulta = await Usuarios.findByIdAndUpdate(id, datos).exec();
     return res.send({
       estado: true,
       mensaje: `Actualizacion exitosa`,
-      consulta: consulta
+      consulta: consulta,
     });
   } catch (error) {
     return res.send({
       estado: true,
       mensaje: `Error al actualizar`,
-      consulta: consulta
+      consulta: consulta,
     });
   }
 };
@@ -105,12 +109,12 @@ const eliminarPorId = async (req, res) => {
     return res.send({
       estado: true,
       mensaje: `Eliminacion exitosa`,
-      consulta: consulta
+      consulta: consulta,
     });
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `Error, no se pudo realizar la consulta`
+      mensaje: `Error, no se pudo realizar la consulta`,
     });
   }
 };
@@ -120,5 +124,5 @@ export default {
   nuevo,
   buscarPorId,
   actualizarPorId,
-  eliminarPorId
+  eliminarPorId,
 };

@@ -89,8 +89,7 @@ const eliminarPorId = async (req, res) => {
   let id = req.params.id;
 
   try {
-    //Logica de buscar  mostrar el resultado
-    //let consulta = await producto.find(id).exec();
+
     let consulta = await Roles.findOneAndDelete({ _id: id }).exec();
 
     return res.send({
