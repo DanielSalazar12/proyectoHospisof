@@ -9,12 +9,7 @@ import {
   ClipboardIcon,
 } from "@heroicons/react/24/solid";
 
-import {
-  Home,
-  Profile,
-  Medicamentos,
-  Medicos,
-} from "@/pages/dashboard"; //importamos los componentes de las paginas
+import { Home, Medicamentos, Medicos, Diagnostico } from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
@@ -37,7 +32,7 @@ export const routes = [
         icon: <UserCircleIcon {...icon} />,
         name: "diagnostico",
         path: "/diagnostico",
-        element: <Profile />,
+        element: <Diagnostico />,
       },
       {
         icon: <TableCellsIcon {...icon} />,

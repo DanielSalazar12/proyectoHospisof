@@ -25,6 +25,8 @@ import {
   Select,
   Option,
   Textarea,
+  List,
+  ListItem,
 } from "@material-tailwind/react";
 import {
   HomeIcon,
@@ -41,25 +43,122 @@ import {
   ClipboardDocumentIcon,
   UsersIcon,
   UserIcon,
+  PhoneIcon,
+  CalendarDaysIcon,
+  EnvelopeIcon,
+  IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
-import { data } from "autoprefixer";
+import axios from "axios";
+const urlApi = "http://127.0.0.1:3000/api/patient/";
 
-export function Profile() {
+export function Diagnostico() {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("Busqueda");
   const [type2, setType2] = useState("Informacion");
   const [fechaHoy, setFecha] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [resultados, setResultados] = useState([]);
+  const [pacientes, setPacientes] = useState([]);
+  const [paciente, onSeleccionar] = useState([]);
 
-  const handleOpen = () => {
-    /*   let info = medicos.find((medico) => medico.documento === documento);
-    action === "edit" ?  setOpen2(!open2) :*/ setOpen(!open);
-    /* setdetalles(info); */
+  const fetchPacientes = useCallback(async () => {
+    try {
+      const response = await axios.get(urlApi + "list");
+      if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        setPacientes(response.data.data);
+      } else {
+        console.log("La respuesta de la API no es la qué se esperaba.");
+        setPacientes([]);
+      }
+    } catch (error) {
+      console.log("Error al obtener los medicamentos: " + error.message);
+      setPacientes([]);
+    }
+  }, [urlApi]);
+
+  useEffect(() => {
+    fetchPacientes();
+  }, [fetchPacientes, refresh]);
+  const handleBusqueda = (e) => {
+    const value = e.target.value;
+    setBusqueda(value);
+    setResultados(
+      pacientes.filter(
+        (p) =>
+          p.nombre.toLowerCase().includes(value.toLowerCase()) ||
+          p.cedula.includes(value),
+      ),
+    );
   };
+  const handleSeleccion = (paciente) => {
+    onSeleccionar(paciente);
+    setBusqueda("");
+    setResultados([]);
+  };
+  const handleOpen = () => {
+    setOpen(!open);
+  };
+  function SeleccionPaciente() {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto mt-8">
+        {paciente && (
+          <Card className="p-4 md:flex items-center shadow-lg rounded-xl  w-full max-w-3xl bg-white">
+            <img
+              src={
+                paciente.foto ||
+                "https://via.placeholder.com/100x100?text=Paciente"
+              }
+              alt="Foto del paciente"
+              className="w-24 h-24 rounded-full object-cover border border-gray-300 mx-auto md:mx-0"
+            />
 
+            <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left w-full">
+              <h2 className="text-xl font-bold text-blue-700">
+                {paciente.nombre}
+              </h2>
+              <p className="text-sm text-gray-500 mb-4">Paciente registrado</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2">
+                  <IdentificationIcon className="h-4 w-4 text-blue-500" />
+                  <span>
+                    <strong>ID:</strong> {paciente.cedula}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <PhoneIcon className="h-4 w-4 text-blue-500" />
+                  <span>
+                    <strong>Teléfono:</strong> {paciente.telefono}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CalendarDaysIcon className="h-4 w-4 text-blue-500" />
+                  <span>
+                    <strong>F. Nacimiento:</strong> {paciente.nacimiento}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <EnvelopeIcon className="h-4 w-4 text-blue-500" />
+                  <span>
+                    <strong>Email:</strong> {paciente.email}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+    );
+  }
   const handleChange = () => {};
   return (
     <>
@@ -193,26 +292,38 @@ export function Profile() {
               </div>
               <TabPanel value="Busqueda">
                 <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-1">
-                  <div className="flex gap-4 mt-4">
-                    <div className="w-full">
+                  <div className="flex gap-4 mt-4 mb-3">
+                    <div className="relative w-full max-w-md">
                       <Tooltip content="Buscar paciente">
                         <Input
                           size="lg"
                           type="text"
                           name="search"
                           label="Buscar"
-                          icon={
-                            <i className="fa-solid fa-user-tie"></i>
-                          }
+                          value={busqueda}
+                          onChange={handleBusqueda}
+                          icon={<i className="fa-solid fa-user-tie"></i>}
                           /* onChange={(e) => setBusqueda(e.target.value)} */
                         />
                       </Tooltip>
+                      {resultados.length > 0 && (
+                        <List className="absolute z-10 w-full bg-white shadow-lg rounded-b-lg max-h-48 overflow-auto">
+                          {resultados.map((p) => (
+                            <ListItem
+                              key={p.cedula}
+                              onClick={() => handleSeleccion(p)}
+                              className="cursor-pointer"
+                            >
+                              {p.nombre} — {p.cedula}
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
                     </div>
                     <div className="w-full">
-                      <IconButton color="light-blue">
-                        {" "}
-                        <i class="fa-solid fa-magnifying-glass"></i>{" "}
-                      </IconButton>
+                      <div className="flex justify-center ">
+                        {SeleccionPaciente()}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -266,13 +377,7 @@ export function Profile() {
                   >
                     Diagnosticos Anteriores
                   </Typography>
-                  {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 mt-2">
-              <div className="flex gap-4 mt-4">
-                <div className="w-full">
-                  <div className="mb-3 flex gap-3"></div>
-                </div>
-              </div>
-            </div> */}
+
                   <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
                     {projectsData.map(
                       ({
@@ -280,7 +385,6 @@ export function Profile() {
                         title,
                         tag,
                         diagPrincipal,
-                        diagSecundario,
                         fecha,
                         eps,
                         motivoConsulta,
@@ -827,4 +931,4 @@ export function Profile() {
   );
 }
 
-export default Profile;
+export default Diagnostico;

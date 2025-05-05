@@ -31,7 +31,7 @@ const ListMedicamentos = () => {
   const [medicamento, setMedicamento] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const urlApi = "http://127.0.0.1:3000/api/medicamentos/";
+  const urlApi = "http://127.0.0.1:3000/api/medicaments/";
 
   const fetchMedicamentos = useCallback(async () => {
     setLoading(true);
