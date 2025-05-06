@@ -66,6 +66,7 @@ export function Diagnostico() {
   const [pacientes, setPacientes] = useState([]);
   const [paciente, onSeleccionar] = useState([]);
 
+  console.log(pacientes);
   const fetchPacientes = useCallback(async () => {
     try {
       const response = await axios.get(urlApi + "list");
@@ -94,8 +95,9 @@ export function Diagnostico() {
     setBusqueda(value);
     setResultados(
       pacientes.filter(
-        (p) => p.nombre.toLowerCase().includes(value.toLowerCase()) /* ||
-          p.documento.includes(value), */,
+        (p) =>
+          p.nombrePaciente.toLowerCase().includes(value.toLowerCase()) ||
+          p.documento.includes(value),
       ),
     );
   };
@@ -123,7 +125,7 @@ export function Diagnostico() {
 
             <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left w-full">
               <h2 className="text-xl font-bold text-blue-700">
-                {paciente.nombre}
+                {paciente.nombrePaciente}
               </h2>
               <p className="text-sm text-gray-500 mb-4">Paciente registrado</p>
 
@@ -258,13 +260,13 @@ export function Diagnostico() {
                         color="blue-gray"
                         className="mb-1"
                       >
-                        {paciente.nombre}
+                        {paciente.nombrePaciente}
                       </Typography>
                       <Typography
                         variant="small"
                         className="font-normal text-blue-gray-600"
                       >
-                        Paciente / {paciente.eps}
+                        Paciente / {paciente.epsPaciente}
                       </Typography>
                     </div>
                   </div>
@@ -314,7 +316,7 @@ export function Diagnostico() {
                               onClick={() => handleSeleccion(p)}
                               className="cursor-pointer"
                             >
-                              {p.nombre} — {p.documento}
+                              {p.nombrePaciente} — {p.documento}
                             </ListItem>
                           ))}
                         </List>
@@ -333,13 +335,13 @@ export function Diagnostico() {
                   <ProfileInfoCard
                     title="Informacion del paciente"
                     details={{
-                      Nombre: paciente.nombre,
+                      Nombre: paciente.nombrePaciente,
                       Documento: paciente.documento,
                       Sexo: paciente.sexo,
                       "Estado Civil": paciente.estadoCivil,
                       "Fecha Nacimiento": paciente.fecha,
                       EPS: paciente.eps,
-                      Telefono: paciente.telefono,
+                      Telefono: paciente.telefonoPaciente,
                       email: "elvergas@mail.com",
                     }}
                     action={
