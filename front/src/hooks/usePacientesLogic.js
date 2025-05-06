@@ -71,6 +71,7 @@ export function usePacientesLogic() {
         cargarDatos();
     }, []);
 
+    
     const handleEditClick = async (id) => {
         try {
             const paciente = await getPacienteId(id);

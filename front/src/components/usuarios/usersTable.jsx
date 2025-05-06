@@ -5,7 +5,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
 
-export default function UsersTable({ users, roles, handleDelete }) {
+export default function UsersTable({ users, roles, handleDelete, handleEditClick }) {
     return (
         <Card>
             <CardHeader variant="gradient" color="gray" className="mb-8 p-6">

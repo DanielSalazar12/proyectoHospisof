@@ -13,6 +13,8 @@ export default function Users() {
         roles,
         handleChange,
         handleDelete,
+        handleSubmit,
+        handleEditClick,
     } = useUsersLogic();
 
 
@@ -30,15 +32,14 @@ export default function Users() {
                 abrirModalUsuarios={abrirModalUsers}
                 roles={roles}
                 handleChange={handleChange}
+                handleSubmit={handleSubmit}
             />
             <UsersTable
                 users={users}
                 roles={roles}
                 handleDelete={handleDelete}
+                handleEditClick={handleEditClick}
             />
-
-
-
         </div>
     );
 }

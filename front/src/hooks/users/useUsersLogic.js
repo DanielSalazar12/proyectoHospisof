@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-import { fetchUsers, fetchRoles, deleteUser, fetchValidacionDelete } from "@/hooks/users/useUsersData";
+import { fetchUsers, fetchRoles, deleteUser, fetchValidacionDelete, createUser, getUserId} from "@/hooks/users/useUsersData";
 
 import { getPacienteId, deletePaciente } from "@/hooks/usePacientesData";
 
@@ -19,7 +19,8 @@ export const useUsersLogic = () => {
     const [users, setUsers] = useState([]);
     const [roles, setRoles] = useState([]);
     const [formData, setFormData] = useState(initialForm);
-
+    const [modoEdicion, setModoEdicion] = useState(false);
+    const [idUserActual, setIdPacienteActual] = useState(null);
 
     const abrirModalUsers = () => {
         if (open) {
@@ -52,7 +53,87 @@ export const useUsersLogic = () => {
     }, []);
 
 
+    // ----------------------------------------------------Insercion -------------------------
+    const handleSubmit = async () => {
+        const camposRequeridos = [
+            "nombreUsuario",
+            "passwordUser",
+            "emailUser",
+            "rol",
+        ];
 
+        // Validacion de entrada de datos 
+
+        const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+
+        if (camposVacios.length > 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Campos incompletos",
+                text: "Por favor, completa todos los campos antes de continuar.",
+            });
+            return;
+        }
+
+        try {
+            const nuevoUsuario = {
+                nombreUsuario: formData.nombreUsuario,
+                passwordUser: formData.passwordUser,
+                emailUser: formData.emailUser,
+                rol: formData.rol,
+                status: 1,
+            };
+
+            await createUser(nuevoUsuario);
+
+            Swal.fire({
+                icon: "success",
+                title: "Paciente registrado",
+                text: "El paciente fue creado exitosamente.",
+                confirmButtonColor: "#3085d6",
+            });
+
+            abrirModalUsers();
+            setFormData(initialForm);
+            await cargarDatos();
+
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Ocurrió un error al insertar!",
+            });
+        }
+    };
+
+
+
+//=======================================Fcuncion de editar, traer los datos =======================================
+
+   
+    const handleEditClick = async (id) => {
+        try {
+            const user = await getUserId(id);
+
+            setFormData({
+                nombreUsuario: user.nombreUsuario || "",
+                emailUser: user.emailUser || "",
+                passwordUser: user.passwordUser || "",
+                rol: user.rol || "",
+            });
+
+            setUsers(user._id);
+            setModoEdicion(true);
+            setOpen(true);
+        } catch (error) {
+            console.error("Error al cargar paciente:", error);
+            Swal.fire("Error", "No se pudo cargar el usuario", "error");
+        }
+    };
+
+
+//=========================================================================
 
     const handleDelete = async (idUser) => {
         const result = await Swal.fire({
@@ -103,6 +184,8 @@ export const useUsersLogic = () => {
         roles,
         handleChange,
         handleDelete,
+        handleSubmit,
+        handleEditClick,
     }
 
 };
