@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-import { fetchUsers, fetchRoles, deleteUser, fetchValidacionDelete, createUser, getUserId} from "@/hooks/users/useUsersData";
+import { fetchUsers, fetchRoles, deleteUser, fetchValidacionDelete, createUser, getUserId, updateUser } from "@/hooks/users/useUsersData";
 
-import { getPacienteId, deletePaciente } from "@/hooks/usePacientesData";
+import { deletePaciente } from "@/hooks/usePacientesData";
 
 const initialForm = {
     nombreUsuario: "",
@@ -20,12 +20,14 @@ export const useUsersLogic = () => {
     const [roles, setRoles] = useState([]);
     const [formData, setFormData] = useState(initialForm);
     const [modoEdicion, setModoEdicion] = useState(false);
-    const [idUserActual, setIdPacienteActual] = useState(null);
+    const [idUserActual, setIdUserActual] = useState(null);
 
     const abrirModalUsers = () => {
         if (open) {
             // Si se está cerrando la modal, reseteamos todo
             setFormData(initialForm);
+            setModoEdicion(false);
+            setIdUserActual(null);
         }
         setOpen(!open);
     }
@@ -89,7 +91,7 @@ export const useUsersLogic = () => {
             Swal.fire({
                 icon: "success",
                 title: "Paciente registrado",
-                text: "El paciente fue creado exitosamente.",
+                text: "El usuario fue creado exitosamente.",
                 confirmButtonColor: "#3085d6",
             });
 
@@ -109,9 +111,9 @@ export const useUsersLogic = () => {
 
 
 
-//=======================================Fcuncion de editar, traer los datos =======================================
+    //=======================================Fcuncion de editar, traer los datos =======================================
 
-   
+
     const handleEditClick = async (id) => {
         try {
             const user = await getUserId(id);
@@ -123,17 +125,17 @@ export const useUsersLogic = () => {
                 rol: user.rol || "",
             });
 
-            setUsers(user._id);
+            setIdUserActual(user._id);
             setModoEdicion(true);
             setOpen(true);
         } catch (error) {
-            console.error("Error al cargar paciente:", error);
+            console.error("Error al cargar el usuario:", error);
             Swal.fire("Error", "No se pudo cargar el usuario", "error");
         }
     };
 
 
-//=========================================================================
+    //=========================================================================
 
     const handleDelete = async (idUser) => {
         const result = await Swal.fire({
@@ -175,6 +177,59 @@ export const useUsersLogic = () => {
         }
     };
 
+    //================================================Editar==========================
+
+    const handleUpdate = async () => {
+        const camposRequeridos = [
+            "nombreUsuario",
+            "passwordUser",
+            "emailUser",
+            "rol",
+        ];
+
+        const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+
+        if (camposVacios.length > 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Campos incompletos",
+                text: "Por favor, completa todos los campos antes de continuar.",
+            });
+            return;
+        }
+
+        try {
+            const userActualizado = {
+                nombreUsuario: formData.nombreUsuario,
+                passwordUser: formData.passwordUser,
+                emailUser: formData.emailUser,
+                rol: formData.rol,
+                status: 1,
+            };
+
+            console.log(idUserActual, userActualizado);
+            await updateUser(idUserActual, userActualizado);
+
+            Swal.fire({
+                icon: "success",
+                title: "Usuario actualizado",
+                text: "Los datos fueron actualizados exitosamente.",
+            });
+
+            abrirModalUsers();
+            setFormData(initialForm);
+            setModoEdicion(false);
+            await cargarDatos();
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo actualizar el usuario.",
+            });
+        }
+    };
+
 
     return {
         open,
@@ -186,6 +241,9 @@ export const useUsersLogic = () => {
         handleDelete,
         handleSubmit,
         handleEditClick,
+        modoEdicion,
+        idUserActual,
+        handleUpdate,
     }
 
 };

@@ -43,7 +43,7 @@ export const createUser = async (formData) => {
 
 export const updateUser = async (id, formData) => {
     try {
-        const response = await axios.post(`http://localhost:3000/api/usuario/actualizar/${id}`, formData);
+        const response = await axios.put(`http://localhost:3000/api/usuario/actualizar/${id}`, formData);
         return response.data;
     } catch (error) {
         throw error;

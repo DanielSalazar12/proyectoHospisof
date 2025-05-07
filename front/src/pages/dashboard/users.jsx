@@ -12,9 +12,11 @@ export default function Users() {
         users,
         roles,
         handleChange,
+        modoEdicion,
+        handleUpdate,
         handleDelete,
-        handleSubmit,
         handleEditClick,
+
     } = useUsersLogic();
 
 
@@ -32,7 +34,9 @@ export default function Users() {
                 abrirModalUsuarios={abrirModalUsers}
                 roles={roles}
                 handleChange={handleChange}
-                handleSubmit={handleSubmit}
+                modoEdicion={modoEdicion}
+                handleUpdate={handleUpdate}
+
             />
             <UsersTable
                 users={users}
