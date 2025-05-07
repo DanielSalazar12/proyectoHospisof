@@ -61,7 +61,7 @@ const ListMedicamentos = () => {
   }, [fetchMedicamentos, refresh]);
 
   const busqueda = medicamento.filter((medicamento) =>
-    medicamento.nombre.toLowerCase().includes(buscar.toLowerCase())
+    medicamento.nombre.toLowerCase().includes(buscar.toLowerCase()),
   );
 
   const handleOpen = (codigo, action) => {
@@ -92,7 +92,7 @@ const ListMedicamentos = () => {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
-            }
+            },
           );
 
           if (response.data.estado === true) {
@@ -120,7 +120,7 @@ const ListMedicamentos = () => {
         console.log("No es un Object :", data);
       }
     },
-    [refresh, urlApi]
+    [refresh, urlApi],
   );
 
   useEffect(() => {
@@ -165,7 +165,7 @@ const ListMedicamentos = () => {
         }
       });
     },
-    [refresh, urlApi]
+    [refresh, urlApi],
   );
 
   return (
@@ -282,16 +282,13 @@ const ListMedicamentos = () => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-11">
         {medicamento.length > 0 &&
           busqueda.map((medicamento) => (
-            <Card
-              className="w-96 shadow-lg relative"
-              key={medicamento.codigo}
-            >
+            <Card className="w-96 shadow-lg relative" key={medicamento.codigo}>
               <CardHeader
                 floated={false}
                 className="h-60 overflow-hidden relative"
               >
                 <img
-                  src={`http://127.0.0.1:3000/api/medicamentos/image/${medicamento.imagen}`}
+                  src={`http://127.0.0.1:3000/api/medicaments/image/${medicamento.imagen}`}
                   alt={`img-medicamento ${medicamento.nombre}`}
                   className="h-full w-full object-cover"
                 />

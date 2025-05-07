@@ -49,27 +49,82 @@ import {
   IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { useState, useCallback, useEffect } from "react";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 import axios from "axios";
-const urlApi = "http://127.0.0.1:3000/api/patient/";
+const urlApi = "http://127.0.0.1:3000/api/diagnostico/";
+const urlApiPatients = "http://127.0.0.1:3000/api/patient/";
 
 export function Diagnostico() {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("Busqueda");
   const [type2, setType2] = useState("Informacion");
-  const [fechaHoy, setFecha] = useState("");
   const [refresh, setRefresh] = useState(false);
   const [busqueda, setBusqueda] = useState("");
-  const [resultados, setResultados] = useState([]);
-  const [pacientes, setPacientes] = useState([]);
-  const [paciente, onSeleccionar] = useState([]);
 
-  console.log(pacientes);
+  const [diagnosticos, setDiagnosticos] = useState([]); // Diagnosticos del pacientes
+  const [diagnostico, setDiagnostico] = useState(null); // Diagnostico seleccionado para ver la informacion
+
+  const [paciente, setPaciente] = useState([]);
+  const [pacientes, setPacientes] = useState([]);
+  const [pacienteValido, setPacienteValido] = useState(false);
+  const handleOpen = (diagnosticoId) => {
+    let info = diagnosticos.find((d) => d._id == diagnosticoId);
+    setOpen(true);
+    setDiagnostico(info);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setDiagnostico([]);
+  };
+  const handleReadInput = (e) => {
+    const value = e.target.value;
+    setBusqueda(value);
+  };
+
+  const validPaciente = () => {
+    const patient = pacientes.find((p) => p.documento == busqueda);
+    if (!patient) {
+      Swal.fire({
+        title: "Documento Invalido",
+        text: "¡El usuario no existe en el sistema!",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 2400,
+      });
+      setPacienteValido(false);
+      setPaciente([]);
+    } else {
+      setPaciente(patient);
+      handleBusqueda(busqueda);
+      setPacienteValido(true);
+    }
+  };
+  const handleBusqueda = async (documento) => {
+    try {
+      const response = await axios.get(urlApi + `list/${documento}`);
+      if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        setDiagnosticos(response.data.data);
+      } else {
+        console.log("La respuesta de la API no es la qué se esperaba.");
+        setDiagnosticos([]);
+      }
+    } catch (error) {
+      console.log(
+        "Error al obtener los diagnosticos del paciente: " + error.message,
+      );
+      setDiagnosticos([]);
+    }
+  };
   const fetchPacientes = useCallback(async () => {
     try {
-      const response = await axios.get(urlApi + "list");
+      const response = await axios.get(urlApiPatients + "list");
       if (
         response.data &&
         response.data.data &&
@@ -81,16 +136,23 @@ export function Diagnostico() {
         setPacientes([]);
       }
     } catch (error) {
-      console.log("Error al obtener los medicamentos: " + error.message);
+      console.log(
+        "Error al obtener los pacientes del sistema: " + error.message,
+      );
       setPacientes([]);
     }
-  }, [urlApi]);
+  }, [urlApiPatients]);
 
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
+  /*   const handleSeleccion = (paciente) => {
+    onSeleccionar(paciente);
+    setBusqueda("");
+    setResultados([]);
+  }; */
 
-  const handleBusqueda = (e) => {
+  /* const handleBusqueda = (e) => {
     const value = e.target.value;
     setBusqueda(value);
     setResultados(
@@ -100,117 +162,53 @@ export function Diagnostico() {
           p.documento.includes(value),
       ),
     );
-  };
-  const handleSeleccion = (paciente) => {
-    onSeleccionar(paciente);
-    setBusqueda("");
-    setResultados([]);
-  };
-  const handleOpen = () => {
-    setOpen(!open);
-  };
-  function SeleccionPaciente() {
-    return (
-      <div className="space-y-6 max-w-3xl mx-auto mt-8">
-        {paciente && (
-          <Card className="p-4 md:flex items-center shadow-lg rounded-xl  w-full max-w-3xl bg-white">
-            <img
-              src={
-                paciente.foto ||
-                "https://via.placeholder.com/100x100?text=Paciente"
-              }
-              alt="Foto del paciente"
-              className="w-24 h-24 rounded-full object-cover border border-gray-300 mx-auto md:mx-0"
-            />
-
-            <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left w-full">
-              <h2 className="text-xl font-bold text-blue-700">
-                {paciente.nombrePaciente}
-              </h2>
-              <p className="text-sm text-gray-500 mb-4">Paciente registrado</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
-                <div className="flex items-center gap-2">
-                  <IdentificationIcon className="h-4 w-4 text-blue-500" />
-                  <span>
-                    <strong>ID:</strong> {paciente.documento}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <PhoneIcon className="h-4 w-4 text-blue-500" />
-                  <span>
-                    <strong>Teléfono:</strong> {paciente.telefono}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CalendarDaysIcon className="h-4 w-4 text-blue-500" />
-                  <span>
-                    <strong>F. Nacimiento:</strong> {paciente.fecha}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <EnvelopeIcon className="h-4 w-4 text-blue-500" />
-                  <span>
-                    <strong>Sexo:</strong> {paciente.sexo}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-      </div>
-    );
-  }
+  }; */
   const handleChange = () => {};
   return (
     <>
-      <Dialog open={open} size="lg" handler={handleOpen}>
-        <DialogHeader className="flex items-center gap-2">
-          Información Detallada
-        </DialogHeader>
-        <DialogBody
-          divider
-          className="flex flex-col gap-3 text-sm text-gray-700"
+      {diagnostico && (
+        <Dialog
+          size="lg"
+          open={open}
+          handler={handleClose}
+          key={diagnostico._id}
         >
-          <Typography>
-            <span className="font-semibold">
-              {" "}
-              Historia de la Enfermedad Actual:
-            </span>{" "}
-            Paciente masculino de 20 años refiere ardor epigástrico desde hace
-            aproximadamente 3 semanas, especialmente posterior a la ingesta de
-            alimentos condimentados. También presenta episodios de náuseas sin
-            vómito, sin fiebre ni diarrea. Refiere aumento del estrés académico
-            en las últimas semanas.
-          </Typography>
-          <Typography>
-            <span className="font-semibold"> Examen Físico:</span>
-            <p> - Signos vitales dentro de parámetros normales.</p>
-            <p> - Dolor a la palpación en epigastrio sin rebote ni defensa.</p>
-            <p>-Ruidos hidroaéreos presentes.</p>
-            <p> - No hay signos de deshidratación ni ictericia.</p>
-          </Typography>
-          <Typography>
-            <span className="font-semibold">📈 Evolución Clínica:</span> Se
-            indica tratamiento inicial con inhibidores de bomba de protones. Se
-            explican hábitos alimenticios a modificar. Se recomienda control en
-            15 días para evaluación de respuesta al tratamiento.
-          </Typography>
-          <Typography>
-            <span className="font-semibold">Medicamentos Recetados:</span>{" "}
-            <p>1. Omeprazol 20 mg – 1 cápsula en ayunas por 30 días.</p>
-            <p>
-              2. Hidróxido de aluminio + magnesio – 10 ml después de comidas si
-              hay ardor.
-            </p>
-            <p>
-              {" "}
-              3. Lorazepam 0.5 mg – 1 tableta en la noche si hay dificultad para
-              dormir (uso eventual)
-            </p>
-          </Typography>
-        </DialogBody>
-      </Dialog>
+          <DialogHeader className="flex items-center gap-2">
+            Información Detallada
+          </DialogHeader>
+          <DialogBody
+            divider
+            className="flex flex-col gap-3 text-sm text-gray-700"
+          >
+            <Typography>
+              <span className="font-semibold">
+                {" "}
+                Historia de la Enfermedad Actual:
+              </span>{" "}
+              {diagnostico.historia}
+            </Typography>
+            <Typography>
+              <span className="font-semibold"> Examen Físico:</span>
+              <p> - Signos vitales dentro de parámetros normales.</p>
+              <p>
+                {" "}
+                - Dolor a la palpación en epigastrio sin rebote ni defensa.
+              </p>
+              <p>-Ruidos hidroaéreos presentes.</p>
+              <p> - No hay signos de deshidratación ni ictericia.</p>
+            </Typography>
+            <Typography>
+              <span className="font-semibold">📈 Evolución Clínica: </span>
+              {diagnostico.evoClinica}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Medicamentos Recetados:</span>{" "}
+              {}
+              <p>1. Omeprazol 20 mg – 1 cápsula en ayunas por 30 días.</p>
+            </Typography>
+          </DialogBody>
+        </Dialog>
+      )}
 
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
         <div className="absolute inset-0 h-full w-full bg-blue-300" />
@@ -278,13 +276,23 @@ export function Diagnostico() {
                       <UserIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                       Paciente
                     </Tab>
-                    <Tab value="Historial" onClick={() => setType("Historial")}>
+
+                    <Tab
+                      value="Historial"
+                      onClick={() => {
+                        if (pacienteValido) setType("Historial");
+                      }}
+                      disabled={!pacienteValido}
+                    >
                       <HomeIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                       Historial
                     </Tab>
                     <Tab
                       value="Diagnostico"
-                      onClick={() => setType("Diagnostico")}
+                      onClick={() => {
+                        if (pacienteValido) setType("Diagnostico");
+                      }}
+                      disabled={!pacienteValido}
                     >
                       <ClipboardDocumentListIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
                       Nuevo
@@ -299,16 +307,16 @@ export function Diagnostico() {
                       <Tooltip content="Buscar paciente">
                         <Input
                           size="lg"
-                          type="text"
+                          type="number"
                           name="search"
                           label="Buscar"
                           value={busqueda}
-                          onChange={handleBusqueda}
+                          onChange={handleReadInput}
                           icon={<i className="fa-solid fa-user-tie"></i>}
                           /* onChange={(e) => setBusqueda(e.target.value)} */
                         />
                       </Tooltip>
-                      {resultados.length > 0 && (
+                      {/*    {resultados.length > 0 && (
                         <List className="absolute z-10 w-full bg-white shadow-lg rounded-b-lg max-h-48 overflow-auto">
                           {resultados.map((p) => (
                             <ListItem
@@ -320,12 +328,15 @@ export function Diagnostico() {
                             </ListItem>
                           ))}
                         </List>
-                      )}
+                      )} */}
                     </div>
                     <div className="w-full">
-                      <div className="flex justify-center ">
-                        {SeleccionPaciente()}
-                      </div>
+                      <Tooltip content="Buscar">
+                        <IconButton color="blue" onClick={validPaciente}>
+                          {" "}
+                          <i className="fa-solid fa-magnifying-glass"></i>
+                        </IconButton>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>
@@ -381,18 +392,18 @@ export function Diagnostico() {
                   </Typography>
 
                   <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
-                    {projectsData.map(
+                    {diagnosticos.map(
                       ({
                         img,
                         title,
-                        tag,
+                        _id,
                         diagPrincipal,
                         fecha,
                         eps,
                         motivoConsulta,
                         medico,
                       }) => (
-                        <Card key={title} color="transparent" shadow={false}>
+                        <Card key={_id} color="transparent" shadow={false}>
                           <CardHeader
                             floated={false}
                             color="gray"
@@ -405,12 +416,6 @@ export function Diagnostico() {
                             />
                           </CardHeader>
                           <CardBody className="py-0 px-1">
-                            <Typography
-                              variant="small"
-                              className="font-normal text-blue-gray-500"
-                            >
-                              {tag}
-                            </Typography>
                             <Typography
                               variant="h5"
                               color="blue-gray"
@@ -457,7 +462,7 @@ export function Diagnostico() {
                             <Link to={""}>
                               <Button
                                 variant="outlined"
-                                onClick={handleOpen}
+                                onClick={() => handleOpen(_id)}
                                 size="sm"
                               >
                                 ver completo
@@ -826,7 +831,7 @@ export function Diagnostico() {
                                       color="blue"
                                       name="indicaciones"
                                       label="Indicaciones"
-                                      rquired
+                                      required
                                     ></Input>
                                   </div>
                                   <div className="w-full">
