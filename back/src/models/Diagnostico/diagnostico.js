@@ -1,35 +1,41 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
-const medicamentoSchema = new mongoose.Schema({
+const medicamentoSchema = new Schema({
   nombre: { type: String, required: true },
   dosis: { type: String, required: true },
-  indicaciones: { type: String, required: true },
+  frecuencia: { type: String, required: true },
+  duracion: { type: String, required: true }
 });
-const examenFisicoSchema = new mongoose.Schema({
-  signosVitales: { type: String, required: true },
-  hallazgos: [{ type: String }],
-});
-const diagnosticoSchema = new mongoose.Schema(
+
+const diagnosticoSchema = new Schema(
   {
-    diagnostico_id: { type: String, required: true, unique: true },
     medicalId: {
       type: Types.ObjectId,
       ref: "Medical",
-      required: true,
+      required: true
     },
     patientId: {
       type: Types.ObjectId,
-      ref: "Patient",
-      required: true,
+      ref: "Patients",
+      required: true
     },
     fecha: { type: Date, required: true },
     motivoConsulta: { type: String, required: true },
     diagPrincipal: { type: String, required: true },
     diagSecundario: [{ type: String }],
     historia: { type: String },
-    examenFisico: examenFisicoSchema,
+    examenFisico: [
+      {
+        presionArterial: { type: String, required: true },
+        frecuenciaCardiaca: { type: String, required: true },
+        frecuenciaRespiratoria: { type: String, required: true },
+        temperatura: { type: String, required: true },
+        observaciones: { type: String, required: true }
+      }
+    ],
     evoClinica: { type: String },
     medicamentos: [medicamentoSchema],
+    status: { type: String, required: true }
   },
   { collection: "diagnostico" }
 );
