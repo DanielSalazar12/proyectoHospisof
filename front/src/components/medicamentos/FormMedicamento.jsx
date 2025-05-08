@@ -119,6 +119,7 @@ const FormMedicamento = ({ activeStep }) => {
                 value={formulario.nombre}
                 onChange={handleChange}
                 className="placeholder:opacity-100 focus:!border-t-gray-900"
+              
                 containerProps={{
                   className: "!min-w-full",
                 }}

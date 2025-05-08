@@ -237,7 +237,6 @@ const ListMedicos = ({
             />
           </div>
         </div>
-        
       </div>
       {loading && <Typography>Cargando medicos...</Typography>}
       {error && <Typography color="red">{error}</Typography>}

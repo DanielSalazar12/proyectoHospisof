@@ -38,7 +38,7 @@ export default function FormDiagnostico({ dataPaciente }) {
     observaciones: "",
   });
   const [formulario, setFormulario] = useState({
-    medicoId: "",
+    medicoId: "681a25e50db1d08e1f470876",
     pacienteId: "",
     fecha: "",
     motivoConsulta: "",
@@ -98,11 +98,9 @@ export default function FormDiagnostico({ dataPaciente }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
     let data = {
       medicoId: formulario.medicoId,
-      pacienteId: formulario.pacienteId,
+      pacienteId: dataPaciente._id,
       fecha: formulario.fecha,
       motivoConsulta: formulario.motivoConsulta,
       diagPrincipal: formulario.diagPrincipal,
@@ -112,6 +110,7 @@ export default function FormDiagnostico({ dataPaciente }) {
       evoClinica: formulario.evoClinica,
       medicamentos: medicamentos,
     };
+    console.log(data);
     hanlseInsert(data);
   };
 
@@ -123,9 +122,9 @@ export default function FormDiagnostico({ dataPaciente }) {
         Object.entries(formDiagnostico).forEach(([key, value]) => {
           formData.append(key, value);
         });
-        console.log("", formData.get("fecha"));
-        /*  try {
-          const response = await axios.post(urlApi + "create/", data, {
+
+         try {
+          const response = await axios.post(urlApi + "create/", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -141,7 +140,7 @@ export default function FormDiagnostico({ dataPaciente }) {
               showConfirmButton: false,
               timer: 1900,
             });
-            setFormData({
+            setFormulario({
               medicoId: "",
               pacienteId: "",
               fecha: "",
@@ -174,7 +173,7 @@ export default function FormDiagnostico({ dataPaciente }) {
         } catch (error) {
           Swal.fire("Error", "Ocurrió un problema", "error");
           console.error("Update error:", error);
-        } */
+        } 
       } else {
         console.log("No es un Object :", data);
       }
@@ -244,7 +243,9 @@ export default function FormDiagnostico({ dataPaciente }) {
                             <Input
                               type="date"
                               color="blue"
-                              name="fechaDiagnostico"
+                              name="fecha"
+                              value={formulario.fecha}
+                              onChange={handleChange}
                               required
                             ></Input>
                           </div>
