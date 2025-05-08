@@ -96,7 +96,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
 }
 
 Sidenav.defaultProps = {
-  brandImg: "/img/hospital.png",
+  brandImg: "img/hospital.png",
   brandName: "Hospi Soft",
 };
 

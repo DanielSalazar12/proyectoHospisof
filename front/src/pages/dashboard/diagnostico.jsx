@@ -54,13 +54,13 @@ import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { useState, useCallback, useEffect } from "react";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 import axios from "axios";
+import FormDiagnostico from "@/components/diagnosticos/FormDiagnostico";
 const urlApi = "http://127.0.0.1:3000/api/diagnostico/";
 const urlApiPatients = "http://127.0.0.1:3000/api/patient/";
 
 export function Diagnostico() {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("Busqueda");
-  const [type2, setType2] = useState("Informacion");
   const [refresh, setRefresh] = useState(false);
   const [busqueda, setBusqueda] = useState("");
 
@@ -70,6 +70,7 @@ export function Diagnostico() {
   const [paciente, setPaciente] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [pacienteValido, setPacienteValido] = useState(false);
+
   const handleOpen = (diagnosticoId) => {
     let info = diagnosticos.find((d) => d._id == diagnosticoId);
     setOpen(true);
@@ -146,23 +147,7 @@ export function Diagnostico() {
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
-  /*   const handleSeleccion = (paciente) => {
-    onSeleccionar(paciente);
-    setBusqueda("");
-    setResultados([]);
-  }; */
 
-  /* const handleBusqueda = (e) => {
-    const value = e.target.value;
-    setBusqueda(value);
-    setResultados(
-      pacientes.filter(
-        (p) =>
-          p.nombrePaciente.toLowerCase().includes(value.toLowerCase()) ||
-          p.documento.includes(value),
-      ),
-    );
-  }; */
   const handleChange = () => {};
   return (
     <>
@@ -202,8 +187,7 @@ export function Diagnostico() {
               {diagnostico.evoClinica}
             </Typography>
             <Typography>
-              <span className="font-semibold">Medicamentos Recetados:</span>{" "}
-              {}
+              <span className="font-semibold">Medicamentos Recetados:</span> {}
               <p>1. Omeprazol 20 mg – 1 cápsula en ayunas por 30 días.</p>
             </Typography>
           </DialogBody>
@@ -273,7 +257,10 @@ export function Diagnostico() {
                 <div className="w-96">
                   <TabsHeader>
                     <Tab value="Busqueda" onClick={() => setType("Busqueda")}>
-                      <UserIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      <UserIcon
+                        color={pacienteValido ? "green" : "red"}
+                        className="-mt-1 mr-2 inline-block h-5 w-5"
+                      />
                       Paciente
                     </Tab>
 
@@ -316,19 +303,6 @@ export function Diagnostico() {
                           /* onChange={(e) => setBusqueda(e.target.value)} */
                         />
                       </Tooltip>
-                      {/*    {resultados.length > 0 && (
-                        <List className="absolute z-10 w-full bg-white shadow-lg rounded-b-lg max-h-48 overflow-auto">
-                          {resultados.map((p) => (
-                            <ListItem
-                              key={p.documento}
-                              onClick={() => handleSeleccion(p)}
-                              className="cursor-pointer"
-                            >
-                              {p.nombrePaciente} — {p.documento}
-                            </ListItem>
-                          ))}
-                        </List>
-                      )} */}
                     </div>
                     <div className="w-full">
                       <Tooltip content="Buscar">
@@ -351,7 +325,7 @@ export function Diagnostico() {
                       Sexo: paciente.sexo,
                       "Estado Civil": paciente.estadoCivil,
                       "Fecha Nacimiento": paciente.fecha,
-                      EPS: paciente.eps,
+                      EPS: paciente.epsPaciente,
                       Telefono: paciente.telefonoPaciente,
                       email: "elvergas@mail.com",
                     }}
@@ -395,11 +369,10 @@ export function Diagnostico() {
                     {diagnosticos.map(
                       ({
                         img,
-                        title,
                         _id,
                         diagPrincipal,
                         fecha,
-                        eps,
+                        epsPaciente,
                         motivoConsulta,
                         medico,
                       }) => (
@@ -411,7 +384,7 @@ export function Diagnostico() {
                           >
                             <img
                               src={img}
-                              alt={title}
+                              alt={`Diagnosticos -  ${fecha}`}
                               className="h-full w-full object-cover"
                             />
                           </CardHeader>
@@ -421,7 +394,7 @@ export function Diagnostico() {
                               color="blue-gray"
                               className="mt-1 mb-2"
                             >
-                              {title}
+                              {`Diagnostico -  ${fecha}`}
                             </Typography>
                             <Typography
                               variant="small"
@@ -434,7 +407,8 @@ export function Diagnostico() {
                               variant="small"
                               className="font-normal text-blue-gray-500"
                             >
-                              <span className="font-semibold">Eps:</span> {eps}
+                              <span className="font-semibold">Eps:</span>{" "}
+                              {epsPaciente}
                             </Typography>
                             <Typography
                               variant="small"
@@ -476,459 +450,7 @@ export function Diagnostico() {
                 </div>
               </TabPanel>
               <TabPanel value="Diagnostico">
-                <Card className="w-full ">
-                  <CardHeader
-                    color="blue"
-                    floated={false}
-                    shadow={false}
-                    className="m-0 grid place-items-center px-4 py-8 text-center"
-                  >
-                    <div className="mb-3 h-20 p-6 text-white">
-                      <ClipboardDocumentListIcon className="h-10 w-10 text-white"></ClipboardDocumentListIcon>
-                    </div>
-                    <Typography variant="h5" color="white">
-                      Formulario Diagnostico
-                    </Typography>
-                  </CardHeader>
-                  <CardBody>
-                    <Tabs value={type2} className="overflow-visible">
-                      <TabsHeader className="relative z-0 ">
-                        <Tab
-                          value="Informacion"
-                          onClick={() => setType2("Informacion")}
-                        >
-                          Informacion
-                        </Tab>
-                        <Tab value="Examen" onClick={() => setType2("Examen")}>
-                          Examen Fisico
-                        </Tab>
-                        <Tab
-                          value="Medicacion"
-                          onClick={() => setType2("Medicacion")}
-                        >
-                          Medicacion
-                        </Tab>
-                      </TabsHeader>
-                      <TabsBody
-                        className="!overflow-x-hidden !overflow-y-visible"
-                        animate={{
-                          initial: {
-                            x: type2 === "Informacion" ? 400 : -400,
-                          },
-                          mount: {
-                            x: 0,
-                          },
-                          unmount: {
-                            x: type2 === "Informacion" ? 400 : -400,
-                          },
-                        }}
-                      >
-                        <TabPanel value="Informacion" className="p-0">
-                          <form className="mt-9 flex flex-col gap-4">
-                            <div
-                              className="mt-1 flex flex-col gap-4"
-                              onSubmit={handleChange}
-                            >
-                              <div className="my-1">
-                                <div className="flex gap-4 mt-3">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Fecha Diagnostico
-                                    </Typography>
-                                    <Input
-                                      type="date"
-                                      color="blue"
-                                      name="fechaDiagnostico"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Medico
-                                    </Typography>
-                                    <Input
-                                      type="text"
-                                      name="medico"
-                                      color="gray"
-                                      value={"Felipe Anotonio"}
-                                      readOnly
-                                    ></Input>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Nombre Paciente
-                                    </Typography>
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      value={"Juan Daniel Salzar Fosforito"}
-                                      readOnly
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Documento
-                                    </Typography>
-                                    <Input
-                                      min={0}
-                                      type="number"
-                                      color="blue"
-                                      value={1146598322}
-                                      readOnly
-                                      required
-                                    ></Input>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-6">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Motivo Consulta
-                                    </Typography>
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="motivo"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Diagnostico pricipal
-                                    </Typography>
-                                    <Input
-                                      type="text"
-                                      name="diagPrincipal"
-                                      color="blue"
-                                      required
-                                    ></Input>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-6">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Diagnostico Secundario
-                                    </Typography>
-                                    <Textarea
-                                      color="blue"
-                                      size="lg"
-                                      placeholder="eg. Tablestas | Capsulas"
-                                      name="diagSecundario"
-                                      className="placeholder:opacity-100 focus:!border-t-blue-600"
-                                      value=""
-                                      required
-                                      onChange={handleChange}
-                                      containerProps={{
-                                        className: "!min-w-full",
-                                      }}
-                                      labelProps={{
-                                        className: "hidden",
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <Typography
-                              variant="small"
-                              color="gray"
-                              className="flex items-center justify-center gap-2 font-medium opacity-60"
-                            >
-                              <LockClosedIcon className="-mt-0.5 h-4 w-4" />{" "}
-                              Modulo de Informacion general.
-                            </Typography>
-                          </form>
-                        </TabPanel>
-                        <TabPanel value="Examen" className="p-0">
-                          <form className="mt-8 flex flex-col gap-4">
-                            <div
-                              className="mt-1 flex flex-col gap-4"
-                              onSubmit={handleChange}
-                            >
-                              <div className="my-1">
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="lg"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Historia
-                                    </Typography>
-                                    <Textarea
-                                      color="blue"
-                                      size="lg"
-                                      placeholder="eg. Tablestas | Capsulas"
-                                      name="descripcion"
-                                      className="placeholder:opacity-100 focus:!border-t-blue-600"
-                                      required
-                                      onChange={handleChange}
-                                      containerProps={{
-                                        className: "!min-w-full",
-                                      }}
-                                      labelProps={{
-                                        className: "hidden",
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <div className="w-full">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="mb-2 text-left font-medium"
-                                      >
-                                        Signos Vitales.
-                                      </Typography>
-                                      <Input
-                                        type="text"
-                                        color="blue"
-                                        name="signosVitales"
-                                        required
-                                      ></Input>
-                                    </div>
-                                  </div>
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-2 text-left font-medium"
-                                    >
-                                      Hallazgos.
-                                    </Typography>
-                                    <Textarea
-                                      color="blue"
-                                      size="lg"
-                                      placeholder="eg. Tablestas | Capsulas"
-                                      name="hallazgos"
-                                      required
-                                      onChange={handleChange}
-                                      containerProps={{
-                                        className: "!min-w-full",
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <Typography
-                              variant="small"
-                              color="gray"
-                              className="flex items-center justify-center gap-2 font-medium opacity-60"
-                            >
-                              <LockClosedIcon className="-mt-0.5 h-4 w-4" />{" "}
-                              Modulo de Examen Fisico
-                            </Typography>
-                          </form>
-                        </TabPanel>
-                        <TabPanel value="Medicacion" className="p-0">
-                          <form className="mt-8 flex flex-col gap-4">
-                            <div
-                              className="mt-1 flex flex-col gap-4"
-                              onSubmit={handleChange}
-                            >
-                              <div className="my-1">
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="mb-3 text-left font-medium"
-                                    >
-                                      Evolucion Clinica
-                                    </Typography>
-                                    <Textarea
-                                      color="blue"
-                                      size="lg"
-                                      placeholder="eg. Tablestas | Capsulas"
-                                      name="descripcion"
-                                      className="placeholder:opacity-100 focus:!border-t-blue-600"
-                                      value=""
-                                      required
-                                      onChange={handleChange}
-                                      containerProps={{
-                                        className: "!min-w-full",
-                                      }}
-                                      labelProps={{
-                                        className: "hidden",
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Typography
-                                      variant="lg"
-                                      color="blue-gray"
-                                      className="mb-3 text-left font-medium"
-                                    >
-                                      Medicamentos
-                                    </Typography>
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="busqueda"
-                                      placeholder="buscar..."
-                                    ></Input>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="nombre"
-                                      label="Medicamento"
-                                      value={"Paracetamol"}
-                                      readOnly={true}
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      name="dosis"
-                                      color="blue"
-                                      label="Dosis"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="indicaciones"
-                                      label="Indicaciones"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <IconButton color="red">
-                                      <i className="fa-solid fa-ban fa-x2"></i>
-                                    </IconButton>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="nombre"
-                                      label="Medicamento"
-                                      value={"Clonazepam"}
-                                      readOnly={true}
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      name="dosis"
-                                      color="blue"
-                                      label="Dosis"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="indicaciones"
-                                      label="Indicaciones"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <IconButton color="red">
-                                      <i className="fa-solid fa-trash"></i>
-                                    </IconButton>
-                                  </div>
-                                </div>
-                                <div className="flex gap-4 mt-5">
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="nombre"
-                                      label="Medicamento"
-                                      value={"Omeprazol"}
-                                      readOnly={true}
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      name="dosis"
-                                      color="blue"
-                                      label="Dosis"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <Input
-                                      type="text"
-                                      color="blue"
-                                      name="indicaciones"
-                                      label="Indicaciones"
-                                      required
-                                    ></Input>
-                                  </div>
-                                  <div className="w-full">
-                                    <IconButton color="red">
-                                      <i className="fa-solid fa-ban fa-x2"></i>
-                                    </IconButton>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <Button size="lg" color="green">
-                              Guardar
-                            </Button>
-                            <Typography
-                              variant="small"
-                              color="gray"
-                              className="flex items-center justify-center gap-2 font-medium opacity-60"
-                            >
-                              <LockClosedIcon className="-mt-0.5 h-4 w-4" />{" "}
-                              Modulo de Evolucion y Medicacion.
-                            </Typography>
-                          </form>
-                        </TabPanel>
-                      </TabsBody>
-                    </Tabs>
-                  </CardBody>
-                </Card>
+                <FormDiagnostico dataPaciente={paciente}></FormDiagnostico>
               </TabPanel>
             </CardBody>
           </TabsBody>
