@@ -38,6 +38,7 @@ export const getAll = async (documento) => {
 };
 
 export const add = async (data) => {
+  console.log(data)
   try {
     const diagnosticoNuevo = new Diagnostico({
       fecha: data.fecha,

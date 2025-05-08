@@ -6,7 +6,7 @@ const medicamentoSchema = new Schema({
   frecuencia: { type: String, required: true },
   duracion: { type: String, required: true },
   codigo: { type: String, required: true },
-  _id: { type: String, required: true }
+  _id: { type: String, required: true },
 });
 
 const diagnosticoSchema = new Schema(
@@ -14,14 +14,14 @@ const diagnosticoSchema = new Schema(
     medicalId: {
       type: Types.ObjectId,
       ref: "Medical",
-      required: true
+      required: true,
     },
     patientId: {
       type: Types.ObjectId,
       ref: "Patients",
-      required: true
+      required: true,
     },
-    fecha: { type: Date, required: true },
+    fecha: { type: String, required: true },
     motivoConsulta: { type: String, required: true },
     diagPrincipal: { type: String, required: true },
     diagSecundario: [{ type: String }],
@@ -32,12 +32,12 @@ const diagnosticoSchema = new Schema(
         frecuenciaCardiaca: { type: String, required: true },
         frecuenciaRespiratoria: { type: String, required: true },
         temperatura: { type: String, required: true },
-        observaciones: { type: String, required: true }
-      }
+        observaciones: { type: String, required: true },
+      },
     ],
     evoClinica: { type: String },
     medicamentos: [medicamentoSchema],
-    status: { type: String, required: true }
+    status: { type: String, required: true },
   },
   { collection: "diagnostico" }
 );
