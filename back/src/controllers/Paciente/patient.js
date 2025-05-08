@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 export const getAll = async () => {
   try {
     let listaPacientes = await Patients.find()
-      .populate('idUsuario') // Con esto relaciona el campo y segunel id, trae los datos del usuario
+      .populate("idUsuario") // Con esto relaciona el campo y segunel id, trae los datos del usuario
       .exec();
     return {
       estado: true,
@@ -17,7 +17,6 @@ export const getAll = async () => {
     };
   }
 };
-
 
 export const add = async (data) => {
   const patientExist = await Patients.findOne({ documento: data.documento });
@@ -62,7 +61,7 @@ export const updatePatient = async (data) => {
     emailPaciente: data.email,
     telefonoPaciente: data.telefono,
     fechaNacimiento: data.fecha,
-    epsPaciente: data.eps
+    epsPaciente: data.eps,
   };
   try {
     let patientUpdate = await Patients.findByIdAndUpdate(id, info);
@@ -76,6 +75,24 @@ export const updatePatient = async (data) => {
       estado: false,
       mensaje: `Error: ${error}`,
     };
+  }
+};
+
+export const validatePacienteDocument = async (req, res) => {
+  let documento = req.params.documento;
+
+  try {
+    let consulta = await Patients.findById(documento).exec();
+    return res.send({
+      estado: true,
+      mensaje: `Busqueda exitosa`,
+      consulta: consulta,
+    });
+  } catch (error) {
+    return res.send({
+      estado: false,
+      mensaje: `Error, no se pudo realizar la consulta`,
+    });
   }
 };
 

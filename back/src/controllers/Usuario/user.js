@@ -49,7 +49,6 @@ const nuevo = async (req, res) => {
   }
 };
 
-
 const buscarPorId = async (req, res) => {
   let id = req.params.id;
 
@@ -77,7 +76,9 @@ const buscarPorIdUser = async (req, res) => {
   try {
     const usuarioId = new mongoose.Types.ObjectId(idUsuario);
 
-    const pacienteRelacionado = await Patient.findOne({ idUsuario: usuarioId }).exec();
+    const pacienteRelacionado = await Patient.findOne({
+      idUsuario: usuarioId,
+    }).exec();
 
     if (pacienteRelacionado) {
       return res.send({

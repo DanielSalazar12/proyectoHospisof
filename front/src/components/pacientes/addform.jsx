@@ -2,6 +2,9 @@ import {
     Dialog, DialogHeader, DialogBody, DialogFooter,
     Input, Select, Option, Button, Typography,
     Tabs, TabsHeader, TabsBody, Tab, TabPanel,
+    Card,
+    CardHeader,
+    CardBody,
 } from "@material-tailwind/react";
 
 import { useState } from "react";
@@ -24,12 +27,14 @@ export default function PacientesForm({
     const [activeTab, setActiveTab] = useState("datos");
 
     return (
-        <Dialog open={open} handler={abrirModalUsuarios} size="xl">
-            <DialogHeader>
-                {modoEdicion ? "Editar Paciente" : "Registrar Nuevo Paciente"}
-            </DialogHeader>
-
-            <Tabs value={activeTab} className="px-6">
+        <Dialog open={open} handler={abrirModalUsuarios} size="md" className="rounded-t-xl" >
+    
+<Card className="w-full"> 
+    <CardHeader color="gray" className="m-0 grid place-items-center px-4 py-8 text-center" >
+    {modoEdicion ? "Editar Paciente" : "Registrar Nuevo Paciente"}
+    </CardHeader>
+    <CardBody>
+    <Tabs value={activeTab} className="px-6">
                 <TabsHeader className="mb-4">
                     <Tab
                         value="datos"
@@ -116,6 +121,9 @@ export default function PacientesForm({
                     </TabPanel>
                 </TabsBody>
             </Tabs>
+    </CardBody>
+</Card>
+          
 
             <DialogFooter>
                 <Button variant="text" color="red" onClick={abrirModalUsuarios} className="mr-2">
