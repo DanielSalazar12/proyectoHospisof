@@ -4,7 +4,9 @@ const medicamentoSchema = new Schema({
   nombre: { type: String, required: true },
   dosis: { type: String, required: true },
   frecuencia: { type: String, required: true },
-  duracion: { type: String, required: true }
+  duracion: { type: String, required: true },
+  codigo: { type: String, required: true },
+  _id: { type: String, required: true }
 });
 
 const diagnosticoSchema = new Schema(
