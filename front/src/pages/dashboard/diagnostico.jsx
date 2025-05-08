@@ -8,13 +8,8 @@ import {
   Tabs,
   TabsHeader,
   Tab,
-  Switch,
   Tooltip,
   Button,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
   IconButton,
   Input,
   Dialog,
@@ -22,37 +17,18 @@ import {
   DialogBody,
   TabPanel,
   TabsBody,
-  Select,
-  Option,
-  Textarea,
-  List,
-  ListItem,
 } from "@material-tailwind/react";
 import {
   HomeIcon,
-  ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
   PencilIcon,
-  NewspaperIcon,
-  ClipboardDocumentCheckIcon,
   ClipboardDocumentListIcon,
-  CreditCardIcon,
-  LockClosedIcon,
-  TrashIcon,
-  ClipboardIcon,
-  ClipboardDocumentIcon,
-  UsersIcon,
   UserIcon,
-  PhoneIcon,
-  CalendarDaysIcon,
-  EnvelopeIcon,
-  IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { useState, useCallback, useEffect } from "react";
-import { platformSettingsData, conversationsData, projectsData } from "@/data";
+import { conversationsData } from "@/data";
 import axios from "axios";
 import FormDiagnostico from "@/components/diagnosticos/FormDiagnostico";
 const urlApi = "http://127.0.0.1:3000/api/diagnostico/";
@@ -147,8 +123,6 @@ export function Diagnostico() {
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
-
-  const handleChange = () => {};
   return (
     <>
       {diagnostico && (
@@ -194,8 +168,8 @@ export function Diagnostico() {
         </Dialog>
       )}
 
-      <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
-        <div className="absolute inset-0 h-full w-full bg-blue-300" />
+      <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/fondo3.jpg')] bg-cover	bg-center">
+        <div className="absolute inset-0 h-full w-full" />
       </div>
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <Tabs value={type}>
@@ -230,7 +204,7 @@ export function Diagnostico() {
                 ) : (
                   <div className="flex items-center gap-6">
                     <Avatar
-                      src="/img/bruce-mars.jpeg"
+                      src="/img/paciente.png"
                       alt="bruce-mars"
                       size="xl"
                       variant="rounded"
@@ -368,7 +342,6 @@ export function Diagnostico() {
                   <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
                     {diagnosticos.map(
                       ({
-                        img,
                         _id,
                         diagPrincipal,
                         fecha,
@@ -383,7 +356,7 @@ export function Diagnostico() {
                             className="mx-0 mt-0 mb-4 h-64 xl:h-40"
                           >
                             <img
-                              src={img}
+                              src={"/img/fondoDiagnostico.jpg"}
                               alt={`Diagnosticos -  ${fecha}`}
                               className="h-full w-full object-cover"
                             />

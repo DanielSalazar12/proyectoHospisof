@@ -45,7 +45,7 @@ export default function FormDiagnostico({ dataPaciente }) {
     diagPrincipal: "",
     diagSecundario: "",
     historia: "",
-    examenFisico: {},
+    examenFisico: [],
     evoClinica: "",
     medicamentos: [
       {
@@ -99,9 +99,9 @@ export default function FormDiagnostico({ dataPaciente }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     let data = {
+      fecha: formulario.fecha,
       medicoId: formulario.medicoId,
       pacienteId: dataPaciente._id,
-      fecha: formulario.fecha,
       motivoConsulta: formulario.motivoConsulta,
       diagPrincipal: formulario.diagPrincipal,
       diagSecundario: formulario.diagSecundario,
@@ -110,29 +110,36 @@ export default function FormDiagnostico({ dataPaciente }) {
       evoClinica: formulario.evoClinica,
       medicamentos: medicamentos,
     };
-    console.log(data);
+
     hanlseInsert(data);
   };
 
   const hanlseInsert = useCallback(
     async (data) => {
       if (typeof data === "object") {
-        const { ...formDiagnostico } = data;
         const formData = new FormData();
-        Object.entries(formDiagnostico).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
 
-         try {
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === "medicamentos" && Array.isArray(value)) {
+            // Iterar sobre cada medicamento y enviarlo como un array
+            value.forEach((item, index) => {
+              formData.append(`medicamentos[${index}]`, JSON.stringify(item));
+            });
+          } else if (key === "examenFisico" && typeof value === "object") {
+            // Convertir `examenFisico` a JSON string
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
+        });
+        try {
           const response = await axios.post(urlApi + "create/", formData, {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
 
           if (response.data.estado === true) {
-            setRefresh(true);
-            stateModal(false);
             Swal.fire({
               title: "Registrado",
               text: response.data.mensaje,
@@ -173,7 +180,7 @@ export default function FormDiagnostico({ dataPaciente }) {
         } catch (error) {
           Swal.fire("Error", "Ocurrió un problema", "error");
           console.error("Update error:", error);
-        } 
+        }
       } else {
         console.log("No es un Object :", data);
       }
