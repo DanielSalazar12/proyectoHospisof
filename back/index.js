@@ -10,6 +10,7 @@ import roles from "./src/routes/roles.js";
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 // rutas
 app.use("/api", diganostico);
@@ -21,7 +22,6 @@ app.use("/api", roles);
 
 const initServe = async () => {
   await cnx();
-
   const puerto = process.env.PORT || 3000;
   app.listen(puerto, () => {
     console.log(`Servidor escuchando en el puerto ${puerto}`);
