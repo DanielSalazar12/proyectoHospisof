@@ -15,6 +15,7 @@ export function Users() {
         modoEdicion,
         handleUpdate,
         handleDelete,
+        handleSubmit,
         handleEditClick,
 
     } = useUsersLogic();
@@ -36,6 +37,7 @@ export function Users() {
                 handleChange={handleChange}
                 modoEdicion={modoEdicion}
                 handleUpdate={handleUpdate}
+                handleSubmit={handleSubmit}
 
             />
             <UsersTable

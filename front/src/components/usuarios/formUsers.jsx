@@ -86,11 +86,15 @@ import {
               Cancelar
             </Button>
             <Button
-              color="green"
-              onClick={modoEdicion ? handleUpdate : handleSubmit}
-            >
-              {modoEdicion ? "Actualizar" : "Registrar"}
-            </Button>
+  color="green"
+  onClick={() => {
+    console.log("Intentando registrar usuario:", formData);
+    modoEdicion ? handleUpdate() : handleSubmit();
+  }}
+>
+  {modoEdicion ? "Actualizar" : "Registrar"}
+</Button>
+
           </CardFooter>
         </Card>
       </Dialog>
