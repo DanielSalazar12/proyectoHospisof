@@ -4,7 +4,7 @@ import UsersTable from "@/components/usuarios/usersTable";
 import { Button } from "@material-tailwind/react";
 
 
-export default function Users() {
+export function Users() {
     const {
         open,
         abrirModalUsers,
@@ -48,5 +48,6 @@ export default function Users() {
     );
 }
 
+export default Users;
 
 

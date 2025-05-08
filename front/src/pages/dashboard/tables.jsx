@@ -4,7 +4,7 @@ import PacientesTable from "@/components/pacientes/pacientesTable";
 import { Button } from "@material-tailwind/react";
 import { epsList } from "@/hooks/usePacientesData";
 
-export default function Tables() {
+export function Tables() {
   const {
     open,
     abrirModalUsuarios,
@@ -49,3 +49,5 @@ export default function Tables() {
     </div>
   );
 }
+
+export default Tables;
