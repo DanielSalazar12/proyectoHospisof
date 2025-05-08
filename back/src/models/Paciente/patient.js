@@ -4,45 +4,45 @@ const patientSchema = new Schema(
   {
     nombrePaciente: {
       type: String,
-      required: true,
+      required: true
     },
     documento: {
       type: Number,
-      required: true,
+      required: true
     },
     telefonoPaciente: {
       type: Number,
-      required: true,
+      required: true
     },
     fechaNacimiento: {
       type: Date,
-      required: true,
+      required: true
     },
     epsPaciente: {
       type: String,
-      required: true,
+      required: true
+    },
+    sexo: {
+      type: String,
+      required: true
+    },
+    direccion: {
+      type: String,
+      required: true
     },
     idUsuario: {
       type: Types.ObjectId, // Esto es para la foránea de Usuarios
       ref: "Usuario",
-      required: true,
+      required: true
     },
     estadoCivil: {
       type: String,
-      required: true,
-    },
-    sexo: {
-      type: String,
-      required: true,
-    },
-    direccion: {
-      type: String,
-      required: true,
+      required: true
     },
     status: {
       type: Number,
-      required: true,
-    },
+      required: true
+    }
   },
   { collection: "pacientes" }
 );

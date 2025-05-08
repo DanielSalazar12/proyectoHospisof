@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/usuario/listartodos", usuarioController.listarTodos);
 router.get("/usuario/listarPorId/:id", usuarioController.buscarPorId);
 router.get("/usuario/listarPorIdUser/:id", usuarioController.buscarPorIdUser);
-router.get("/usuario/listarPorId/:documento", usuarioController.buscarPorId);
+router.get("/usuario/validacion/:documento", usuarioController.buscarPorId);
 router.post("/usuario/nuevo", usuarioController.nuevo);
 router.put("/usuario/actualizar/:id", usuarioController.actualizarPorId);
 router.delete("/usuario/eliminar/:id", usuarioController.eliminarPorId);

@@ -5,14 +5,23 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  HeartIcon,
+  ClipboardIcon,
   UserIcon,
-  UsersIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Users, Notifications } from "@/pages/dashboard";
-//import Usuarios from "@/pages/dashboard/users";
-//import Pacientes from "@/pages/dashboard/Pacientes";
+
+import {
+  Home,
+  Medicamentos,
+  Medicos,
+  Diagnostico,
+  Users,
+  Tables,
+} from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
+import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -29,28 +38,34 @@ export const routes = [
         element: <Home />,
       },
       {
-        icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
-        element: <Profile />,
-      },
-      {
         icon: <UserIcon {...icon} />,
         name: "Usuarios",
         path: "/usuarios",
         element: <Users />,
       },
       {
-        icon: <UsersIcon {...icon} />,
+        icon: <UserGroupIcon {...icon} />,
         name: "Pacientes",
         path: "/pacientes",
         element: <Tables />,
       },
       {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
+        icon: <UserCircleIcon {...icon} />,
+        name: "diagnostico",
+        path: "/diagnostico",
+        element: <Diagnostico />,
+      },
+      {
+        icon: <TableCellsIcon {...icon} />,
+        name: "medicamentos",
+        path: "/medicamentos",
+        element: <Medicamentos />,
+      },
+      {
+        icon: <ClipboardDocumentIcon {...icon} />,
+        name: "medicos",
+        path: "/medicos",
+        element: <Medicos />,
       },
     ],
   },

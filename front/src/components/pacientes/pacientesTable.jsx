@@ -1,5 +1,9 @@
 import {
-    Card, CardHeader, CardBody, Typography, Avatar,
+  Card,
+  CardHeader,
+  CardBody,
+  Typography,
+  Avatar,
 } from "@material-tailwind/react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
@@ -16,7 +20,7 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                 <table className="w-full min-w-[640px] table-auto">
                     <thead>
                         <tr>
-                            {["Nombre", "Función", "Status", "Contacto", "EPS", "Acciones"].map((el) => (
+                            {["Nombre", "Función", "Status", "Contacto", "EPS", ""].map((el) => (
                                 <th key={el} className="border-b border-blue-gray-50 py-3 px-5 text-left">
                                     <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">{el}</Typography>
                                 </th>
@@ -73,33 +77,33 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
 
                                         </td>
 
-                                        <td className={className}>
-                                            <div className="flex gap-3">
-                                                <motion.button
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.95, rotate: -5 }}
-                                                    className="text-blue-500 hover:text-blue-700"
-                                                    onClick={() => handleEditClick(paciente._id)} // Llama a handleEditClick para cargar los datos
-                                                >
-                                                    <PencilIcon className="h-5 w-5" />
-                                                </motion.button>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.95, rotate: -5 }}
-                                                    onClick={() => handleDelete(paciente._id)}
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
-                                                    <TrashIcon className="h-5 w-5" />
-                                                </motion.button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
-                </table>
-            </CardBody>
-        </Card>
-    );
+                    <td className={className}>
+                      <div className="flex gap-3">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95, rotate: -5 }}
+                          className="text-blue-500 hover:text-blue-700"
+                          onClick={() => handleEditClick(paciente._id)} // Llama a handleEditClick para cargar los datos
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95, rotate: -5 }}
+                          onClick={() => handleDelete(paciente._id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </motion.button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </CardBody>
+    </Card>
+  );
 }

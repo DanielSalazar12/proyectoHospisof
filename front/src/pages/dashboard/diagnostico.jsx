@@ -1,0 +1,463 @@
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
+  Avatar,
+  Typography,
+  Tabs,
+  TabsHeader,
+  Tab,
+  Switch,
+  Tooltip,
+  Button,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  IconButton,
+  Input,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  TabPanel,
+  TabsBody,
+  Select,
+  Option,
+  Textarea,
+  List,
+  ListItem,
+} from "@material-tailwind/react";
+import {
+  HomeIcon,
+  ChatBubbleLeftEllipsisIcon,
+  Cog6ToothIcon,
+  PencilIcon,
+  NewspaperIcon,
+  ClipboardDocumentCheckIcon,
+  ClipboardDocumentListIcon,
+  CreditCardIcon,
+  LockClosedIcon,
+  TrashIcon,
+  ClipboardIcon,
+  ClipboardDocumentIcon,
+  UsersIcon,
+  UserIcon,
+  PhoneIcon,
+  CalendarDaysIcon,
+  EnvelopeIcon,
+  IdentificationIcon,
+} from "@heroicons/react/24/solid";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
+import { useState, useCallback, useEffect } from "react";
+import { platformSettingsData, conversationsData, projectsData } from "@/data";
+import axios from "axios";
+import FormDiagnostico from "@/components/diagnosticos/FormDiagnostico";
+const urlApi = "http://127.0.0.1:3000/api/diagnostico/";
+const urlApiPatients = "http://127.0.0.1:3000/api/patient/";
+
+export function Diagnostico() {
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState("Busqueda");
+  const [refresh, setRefresh] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+
+  const [diagnosticos, setDiagnosticos] = useState([]); // Diagnosticos del pacientes
+  const [diagnostico, setDiagnostico] = useState(null); // Diagnostico seleccionado para ver la informacion
+
+  const [paciente, setPaciente] = useState([]);
+  const [pacientes, setPacientes] = useState([]);
+  const [pacienteValido, setPacienteValido] = useState(false);
+
+  const handleOpen = (diagnosticoId) => {
+    let info = diagnosticos.find((d) => d._id == diagnosticoId);
+    setOpen(true);
+    setDiagnostico(info);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setDiagnostico([]);
+  };
+  const handleReadInput = (e) => {
+    const value = e.target.value;
+    setBusqueda(value);
+  };
+
+  const validPaciente = () => {
+    const patient = pacientes.find((p) => p.documento == busqueda);
+    if (!patient) {
+      Swal.fire({
+        title: "Documento Invalido",
+        text: "¡El usuario no existe en el sistema!",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 2400,
+      });
+      setPacienteValido(false);
+      setPaciente([]);
+    } else {
+      setPaciente(patient);
+      handleBusqueda(busqueda);
+      setPacienteValido(true);
+    }
+  };
+  const handleBusqueda = async (documento) => {
+    try {
+      const response = await axios.get(urlApi + `list/${documento}`);
+      if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        setDiagnosticos(response.data.data);
+      } else {
+        console.log("La respuesta de la API no es la qué se esperaba.");
+        setDiagnosticos([]);
+      }
+    } catch (error) {
+      console.log(
+        "Error al obtener los diagnosticos del paciente: " + error.message,
+      );
+      setDiagnosticos([]);
+    }
+  };
+  const fetchPacientes = useCallback(async () => {
+    try {
+      const response = await axios.get(urlApiPatients + "list");
+      if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        setPacientes(response.data.data);
+      } else {
+        console.log("La respuesta de la API no es la qué se esperaba.");
+        setPacientes([]);
+      }
+    } catch (error) {
+      console.log(
+        "Error al obtener los pacientes del sistema: " + error.message,
+      );
+      setPacientes([]);
+    }
+  }, [urlApiPatients]);
+
+  useEffect(() => {
+    fetchPacientes();
+  }, [fetchPacientes, refresh]);
+
+  const handleChange = () => {};
+  return (
+    <>
+      {diagnostico && (
+        <Dialog
+          size="lg"
+          open={open}
+          handler={handleClose}
+          key={diagnostico._id}
+        >
+          <DialogHeader className="flex items-center gap-2">
+            Información Detallada
+          </DialogHeader>
+          <DialogBody
+            divider
+            className="flex flex-col gap-3 text-sm text-gray-700"
+          >
+            <Typography>
+              <span className="font-semibold">
+                {" "}
+                Historia de la Enfermedad Actual:
+              </span>{" "}
+              {diagnostico.historia}
+            </Typography>
+            <Typography>
+              <span className="font-semibold"> Examen Físico:</span>
+              <p> - Signos vitales dentro de parámetros normales.</p>
+              <p>
+                {" "}
+                - Dolor a la palpación en epigastrio sin rebote ni defensa.
+              </p>
+              <p>-Ruidos hidroaéreos presentes.</p>
+              <p> - No hay signos de deshidratación ni ictericia.</p>
+            </Typography>
+            <Typography>
+              <span className="font-semibold">📈 Evolución Clínica: </span>
+              {diagnostico.evoClinica}
+            </Typography>
+            <Typography>
+              <span className="font-semibold">Medicamentos Recetados:</span> {}
+              <p>1. Omeprazol 20 mg – 1 cápsula en ayunas por 30 días.</p>
+            </Typography>
+          </DialogBody>
+        </Dialog>
+      )}
+
+      <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
+        <div className="absolute inset-0 h-full w-full bg-blue-300" />
+      </div>
+      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+        <Tabs value={type}>
+          <TabsBody>
+            <CardBody className="p-4">
+              <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
+                {type === "Busqueda" ? (
+                  <div className="flex items-center gap-6">
+                    <Avatar
+                      src="/img/hospital.png"
+                      alt="bruce-mars"
+                      size="xl"
+                      variant="rounded"
+                      className="rounded-lg shadow-lg shadow-blue-gray-500/40"
+                    />
+                    <div>
+                      <Typography
+                        variant="h5"
+                        color="blue-gray"
+                        className="mb-1"
+                      >
+                        Hospi Soft
+                      </Typography>
+                      <Typography
+                        variant="small"
+                        className="font-normal text-blue-gray-600"
+                      >
+                        Hospital Santa Teresa
+                      </Typography>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-6">
+                    <Avatar
+                      src="/img/bruce-mars.jpeg"
+                      alt="bruce-mars"
+                      size="xl"
+                      variant="rounded"
+                      className="rounded-lg shadow-lg shadow-blue-gray-500/40"
+                    />
+                    <div>
+                      <Typography
+                        variant="h5"
+                        color="blue-gray"
+                        className="mb-1"
+                      >
+                        {paciente.nombrePaciente}
+                      </Typography>
+                      <Typography
+                        variant="small"
+                        className="font-normal text-blue-gray-600"
+                      >
+                        Paciente / {paciente.epsPaciente}
+                      </Typography>
+                    </div>
+                  </div>
+                )}
+
+                <div className="w-96">
+                  <TabsHeader>
+                    <Tab value="Busqueda" onClick={() => setType("Busqueda")}>
+                      <UserIcon
+                        color={pacienteValido ? "green" : "red"}
+                        className="-mt-1 mr-2 inline-block h-5 w-5"
+                      />
+                      Paciente
+                    </Tab>
+
+                    <Tab
+                      value="Historial"
+                      onClick={() => {
+                        if (pacienteValido) setType("Historial");
+                      }}
+                      disabled={!pacienteValido}
+                    >
+                      <HomeIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      Historial
+                    </Tab>
+                    <Tab
+                      value="Diagnostico"
+                      onClick={() => {
+                        if (pacienteValido) setType("Diagnostico");
+                      }}
+                      disabled={!pacienteValido}
+                    >
+                      <ClipboardDocumentListIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
+                      Nuevo
+                    </Tab>
+                  </TabsHeader>
+                </div>
+              </div>
+              <TabPanel value="Busqueda">
+                <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-1">
+                  <div className="flex gap-4 mt-4 mb-3">
+                    <div className="relative w-full max-w-md">
+                      <Tooltip content="Buscar paciente">
+                        <Input
+                          size="lg"
+                          type="number"
+                          name="search"
+                          label="Buscar"
+                          value={busqueda}
+                          onChange={handleReadInput}
+                          icon={<i className="fa-solid fa-user-tie"></i>}
+                          /* onChange={(e) => setBusqueda(e.target.value)} */
+                        />
+                      </Tooltip>
+                    </div>
+                    <div className="w-full">
+                      <Tooltip content="Buscar">
+                        <IconButton color="blue" onClick={validPaciente}>
+                          {" "}
+                          <i className="fa-solid fa-magnifying-glass"></i>
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+              </TabPanel>
+              <TabPanel value="Historial">
+                <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-2">
+                  <ProfileInfoCard
+                    title="Informacion del paciente"
+                    details={{
+                      Nombre: paciente.nombrePaciente,
+                      Documento: paciente.documento,
+                      Sexo: paciente.sexo,
+                      "Estado Civil": paciente.estadoCivil,
+                      "Fecha Nacimiento": paciente.fecha,
+                      EPS: paciente.epsPaciente,
+                      Telefono: paciente.telefonoPaciente,
+                      email: "elvergas@mail.com",
+                    }}
+                    action={
+                      <Tooltip content="Edit Profile">
+                        <PencilIcon className="h-4 w-4 cursor-pointer text-blue-gray-500" />
+                      </Tooltip>
+                    }
+                  />
+                  <div>
+                    <Typography variant="h6" color="blue-gray" className="mb-3">
+                      Historial Medicos
+                    </Typography>
+                    <ul className="flex flex-col gap-6">
+                      {conversationsData.map((props) => (
+                        <MessageCard
+                          key={props.name}
+                          {...props}
+                          action={
+                            <IconButton color="blue" className="rounded-full">
+                              <i className="fa-solid fa-info"></i>
+                            </IconButton>
+                          }
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="px-4 pb-4">
+                  <Typography variant="h6" color="blue-gray" className="mb-2">
+                    Historial Clinico
+                  </Typography>
+                  <Typography
+                    variant="small"
+                    className="font-normal text-blue-gray-500"
+                  >
+                    Diagnosticos Anteriores
+                  </Typography>
+
+                  <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
+                    {diagnosticos.map(
+                      ({
+                        img,
+                        _id,
+                        diagPrincipal,
+                        fecha,
+                        epsPaciente,
+                        motivoConsulta,
+                        medico,
+                      }) => (
+                        <Card key={_id} color="transparent" shadow={false}>
+                          <CardHeader
+                            floated={false}
+                            color="gray"
+                            className="mx-0 mt-0 mb-4 h-64 xl:h-40"
+                          >
+                            <img
+                              src={img}
+                              alt={`Diagnosticos -  ${fecha}`}
+                              className="h-full w-full object-cover"
+                            />
+                          </CardHeader>
+                          <CardBody className="py-0 px-1">
+                            <Typography
+                              variant="h5"
+                              color="blue-gray"
+                              className="mt-1 mb-2"
+                            >
+                              {`Diagnostico -  ${fecha}`}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="font-normal text-blue-gray-500"
+                            >
+                              <span className="font-semibold">Doctor: </span>
+                              {medico}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="font-normal text-blue-gray-500"
+                            >
+                              <span className="font-semibold">Eps:</span>{" "}
+                              {epsPaciente}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="font-normal text-blue-gray-500"
+                            >
+                              <span className="font-semibold">Fecha:</span>{" "}
+                              {fecha}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="font-normal text-blue-gray-500"
+                            >
+                              <span className="font-semibold">Dianostico:</span>{" "}
+                              {diagPrincipal}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="font-normal text-blue-gray-500"
+                            >
+                              <span className="font-semibold">Motivo:</span>{" "}
+                              {motivoConsulta}
+                            </Typography>
+                          </CardBody>
+                          <CardFooter className="mt-6 flex items-center justify-between py-0 px-1">
+                            <Link to={""}>
+                              <Button
+                                variant="outlined"
+                                onClick={() => handleOpen(_id)}
+                                size="sm"
+                              >
+                                ver completo
+                              </Button>
+                            </Link>
+                          </CardFooter>
+                        </Card>
+                      ),
+                    )}
+                  </div>
+                </div>
+              </TabPanel>
+              <TabPanel value="Diagnostico">
+                <FormDiagnostico dataPaciente={paciente}></FormDiagnostico>
+              </TabPanel>
+            </CardBody>
+          </TabsBody>
+        </Tabs>
+      </Card>
+    </>
+  );
+}
+
+export default Diagnostico;

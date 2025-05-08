@@ -49,5 +49,4 @@ export function Tables() {
     </div>
   );
 }
-
 export default Tables;

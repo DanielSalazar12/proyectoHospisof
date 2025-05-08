@@ -11,12 +11,13 @@
   "author": "Felipe Yusti y Daniel Salzar",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
     "celebrate": "^15.0.3",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.14.0",
+    "mongoose": "^8.14.1",
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9"
   }

@@ -1,58 +1,83 @@
 // controlador medico
 import Medicamentos from "../../models/Medicamentos/medicamentos.js";
+// node nativo : fs : filessystem instanciamos para manipular el sistema de archivos del servidor
+import fs from "fs";
+// modulo nativo de node util para manejar las rutas
+import path from "path";
 
 export const getAll = async () => {
   try {
-    let listaMedicos = await Medicamentos.find().exec();
+    let listaMedicamentos = await Medicamentos.find({ status: 1 }).exec();
     return {
       estado: true,
-      data: listaMedicos,
+      data: listaMedicamentos
     };
   } catch (error) {
     return {
       estado: false,
-      mensaje: `Error: ${error}`,
+      mensaje: `Error: ${error}`
     };
   }
 };
-export const avatar = async (data) => {
-  const file = data.file;
-  const filepath = "./uploads/medicamentos/" + file;
-  fs.stat(filepath, (error, exists) => {
+export const getList = async () => {
+  try {
+    let listaMedicamentos = await Medicamentos.find({ status: 1 })
+      .select("nombre _id codigo")
+      .exec();
+    return {
+      estado: true,
+      data: listaMedicamentos
+    };
+  } catch (error) {
+    return {
+      estado: false,
+      mensaje: `Error: ${error}`
+    };
+  }
+};
+export const renderImagen = async (img) => {
+  const file = img;
+  const filepath = "./src/uploads/medicamentos/" + file;
+  await fs.stat(filepath, (error, exists) => {
     if (!exists) {
       return {
         status: false,
-        message: `No existe la imagen: ${error}}`,
+        message: `No existe la imagen: ${error}}`
       };
     }
-
     // Devolver un file
-    return res.sendFile(path.resolve(filePath));
+    return sendFile(path.resolve(filepath));
   });
 };
 export const add = async (data, file) => {
   const extensionesValidas = ["png", "jpg", "jpeg", "gif"];
-  const medicalExist = await Medicamentos.findOne({
-    codigo: data.codigo,
+  const medicamentExist = await Medicamentos.findOne({
+    codigo: data.codigo
   });
-  if (medicalExist) {
-    return {
-      estado: false,
-      mensaje: "El Medicamento ya existe en el sistema",
-    };
-  }
   let image = "";
   if (file) {
     const extension = path.extname(file.originalname).slice(1).toLowerCase();
 
     if (!extensionesValidas.includes(extension)) {
-      await fs.unlink(file.path);
+      fs.unlink(file.path);
       return {
         estado: false,
-        mensaje: "Extensión de archivo no permitida",
+        mensaje: "Extensión de archivo no permitida"
       };
     }
     image = file.filename;
+  }
+  if (medicamentExist) {
+    if (file) {
+      const imagePath = path.join(file.destination, image);
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error al eliminar imagen por médicamento exitesnte:", err);
+      });
+    }
+    return {
+      estado: false,
+      mensaje: "El Medicametno ya existe en el sistema"
+    };
   }
   try {
     const medicalNuevo = new Medicamentos({
@@ -70,31 +95,36 @@ export const add = async (data, file) => {
       imagen: image,
       precioCompra: data.prCompra,
       precioVenta: data.prVenta,
-      status: 1,
+      status: 1
     });
     await medicalNuevo.save();
     return {
       estado: true,
-      mensaje: "Medicamento Registrado exitosamente",
+      mensaje: "Medicamento Registrado exitosamente"
     };
   } catch (error) {
+    if (file) {
+      const imagePath = path.join(file.destination, image);
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error al eliminar la imagen tras fallo:", err);
+      });
+    }
     return {
       estado: false,
-      mensaje: `Error: ${error}`,
+      mensaje: `Error: ${error}`
     };
   }
 };
-export const updateMedical = async (data) => {
+export const updateMedicament = async (data, file, id) => {
   const extensionesValidas = ["png", "jpg", "jpeg", "gif"];
-  let id = data.id;
   let image = "";
   if (file) {
     const extension = path.extname(file.originalname).slice(1).toLowerCase();
     if (!extensionesValidas.includes(extension)) {
-      await fs.unlink(file.path);
+      fs.unlink(file.path);
       return {
         estado: false,
-        mensaje: "Extensión de archivo no permitida",
+        mensaje: "Extensión de archivo no permitida"
       };
     }
     image = file.filename;
@@ -113,19 +143,27 @@ export const updateMedical = async (data) => {
     fechaVencimiento: data.vencimiento,
     imagen: image,
     precioCompra: data.prCompra,
-    precioVenta: data.prVenta,
+    precioVenta: data.prVenta
   };
   try {
     let medicalUpdate = await Medicamentos.findByIdAndUpdate(id, info);
+    console.log(medicalUpdate);
+    console.log("id: " + id);
     return {
       estado: true,
       mensaje: "Actualizacion Exitosa!",
-      result: medicalUpdate,
+      data: medicalUpdate
     };
   } catch (error) {
+    if (file) {
+      const imagePath = path.join(file.destination, image);
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error al eliminar la imagen tras fallo:", err);
+      });
+    }
     return {
       estado: false,
-      mensaje: `Error: ${error}`,
+      mensaje: `Error: ${error}`
     };
   }
 };
@@ -136,12 +174,12 @@ export const searchById = async (data) => {
     return {
       estado: true,
       mensaje: "Consulta Exitosa",
-      result: result,
+      result: result
     };
   } catch (error) {
     return {
       estado: false,
-      mensaje: `Error: ${error}`,
+      mensaje: `Error: ${error}`
     };
   }
 };
@@ -151,12 +189,12 @@ export const deleteById = async (data) => {
     let result = await Medicamentos.findByIdAndUpdate(id, { status: 0 });
     return {
       estado: true,
-      result: result,
+      data: result
     };
   } catch (error) {
     return {
       estado: false,
-      mensaje: `Error: ${error}`,
+      mensaje: `Error: ${error}`
     };
   }
 };

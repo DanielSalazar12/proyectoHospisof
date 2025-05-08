@@ -1,5 +1,5 @@
 import express, { json } from "express";
-
+import multer from "multer";
 const router = express.Router();
 import {
   getAll,
@@ -8,7 +8,7 @@ import {
   searchById,
   subirImagen,
   deleteById,
-  avatar,
+  avatar
 } from "../controllers/Paciente/patient.js";
 
 import { celebrate, Joi, errors, Segments } from "celebrate";
@@ -97,8 +97,8 @@ router.post(
   "/patient/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required(),
-    }),
+      id: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {
@@ -110,5 +110,5 @@ router.post(
     }
   }
 );
-
+router.use(errors());
 export default router;
