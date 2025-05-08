@@ -4,7 +4,7 @@ import UsersTable from "@/components/usuarios/usersTable";
 import { Button } from "@material-tailwind/react";
 //import { epsList } from "@/hooks/usePacientesData";
 
-export default function Users() {
+export function Users() {
   const { open, abrirModalUsers, formData, users, roles, handleChange } =
     useUsersLogic();
 
@@ -27,3 +27,4 @@ export default function Users() {
     </div>
   );
 }
+export default Users;
