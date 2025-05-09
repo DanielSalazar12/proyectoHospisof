@@ -1,7 +1,7 @@
-import Citas from "../../models/citas/citas";
+import Citas from "../../models/citas/citas.js";
 import { Types } from "mongoose";
 
-export const getAll = async () => {
+const getAll = async (req, res) => {
   try {
     let listaCita = await Citas.find().exec();
     res.status(200).send({
@@ -44,4 +44,8 @@ export const nuevo = async (req, res) => {
       mensaje: `Ha ocurrido un error en la consulta: ${error}`,
     });
   }
+};
+
+export default {
+  getAll,
 };

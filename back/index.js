@@ -7,6 +7,7 @@ import medical from "./src/routes/medical.js";
 import patient from "./src/routes/patient.js";
 import user from "./src/routes/user.js";
 import roles from "./src/routes/roles.js";
+import citas from "./src/routes/citas.js";
 
 const app = express();
 app.use(express.json());
@@ -18,6 +19,7 @@ app.use("/api", medical);
 app.use("/api", patient);
 app.use("/api", user);
 app.use("/api", roles);
+app.use("/api", citas);
 
 const initServe = async () => {
   await cnx();

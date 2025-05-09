@@ -24,15 +24,34 @@ const listarTodos = async (req, res) => {
 };
 
 const nuevo = async (req, res) => {
-  let datos = {
-    nombreUsuario: req.body.nombreUsuario,
-    passwordUser: req.body.passwordUser,
-    emailUser: req.body.emailUser,
-    rol: req.body.rol,
-    status: req.body.status || 1,
-  };
-
   try {
+    const emailExist = await Usuarios.findOne({ emailUser: req.body.email });
+    const userExist = await Usuarios.findOne({
+      nombreUsuario: req.body.nombreUsuario,
+    });
+
+    if (userExist) {
+      return res.send({
+        estado: false,
+        mensaje: "El nombre de usuario ya existe en el sistema",
+      });
+    }
+
+    if (emailExist) {
+      return res.send({
+        estado: false,
+        mensaje: "El correo electrónico ya existe en el sistema",
+      });
+    }
+
+    const datos = {
+      nombreUsuario: req.body.nombreUsuario,
+      passwordUser: req.body.passwordUser,
+      emailUser: req.body.email,
+      rol: req.body.rol,
+      status: req.body.status || 1,
+    };
+
     const usuarioNuevo = new Usuarios(datos);
     await usuarioNuevo.save();
 
@@ -44,7 +63,7 @@ const nuevo = async (req, res) => {
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `Ha ocurrido un error en la consulta: ${error}`,
+      mensaje: `Ha ocurrido un error en la consulta: ${error.message}`,
     });
   }
 };

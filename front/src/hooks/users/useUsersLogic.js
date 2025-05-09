@@ -80,7 +80,6 @@ export const useUsersLogic = () => {
       });
       return;
     }
-
     try {
       const nuevoUsuario = {
         nombreUsuario: formData.nombreUsuario,
@@ -90,7 +89,20 @@ export const useUsersLogic = () => {
         status: 1,
       };
 
-      await createUser(nuevoUsuario);
+      const usuarioCreado = await createUser(nuevoUsuario);
+
+      if (!usuarioCreado.estado) {
+        setOpen(false);
+        setFormData(initialForm);
+        setModoEdicion(false);
+        setIdUserActual(null);
+        Swal.fire({
+          icon: "error",
+          title: "Error al registrar usuario",
+          text: usuarioCreado.mensaje || "No se pudo registrar el usuario.",
+        });
+        return;
+      }
 
       Swal.fire({
         icon: "success",
