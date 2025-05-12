@@ -21,21 +21,98 @@ import {
   PhoneIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 
 import FormMedicamento from "@/components/medicamentos/FormMedicamento";
 import ListMedicamentos from "@/components/medicamentos/ListMedicamentos";
 
 export function Medicamentos() {
+  const urlApi = "http://127.0.0.1:3000/api/medicaments/";
   const [activeStep, setActiveStep] = useState(0);
   const [isLastStep, setIsLastStep] = useState(false);
   const [isFirstStep, setIsFirstStep] = useState(false);
-
+  const [medicamentos, setMedicamentos] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [buscar, setBusqueda] = useState("");
+  const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
   const handleNext = () => !isLastStep && setActiveStep((cur) => cur + 1);
   const handlePrev = () => !isFirstStep && setActiveStep((cur) => cur - 1);
-
-  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(!open);
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    totalPaginas: 1,
+    porPagina: 6,
+    totalItems: 0,
+    anteriorPageUrl: null,
+    siguienteUrl: null,
+    primeraUrl: `${urlApi}list/1/6`,
+    ultimaUrl: null,
+  });
+  const handlePageChange = useCallback(
+    async (target) => {
+      try {
+        setLoading(true);
+        setError(null);
+        let url;
+        if (typeof target === "number") {
+          url = `${urlApi}list/${target}/${paginacion.porPagina}`;
+        } else if (typeof target === "string" && target.startsWith("http")) {
+          url = target;
+        } else {
+          url = `${urlApi}list/1/${paginacion.porPagina}`;
+        }
+        const response = await axios.get(url);
+
+        if (response.data && response.data.estado) {
+          setMedicamentos(response.data.data);
+          if (response.data.paginacion) {
+            setPaginacion(response.data.paginacion);
+          } else {
+            const total = response.data.total || response.data.data.length;
+            const limit = paginacion.porPagina;
+            const page = new URL(url).searchParams.get("page") || 1;
+            const currentPage = parseInt(page);
+            const totalPages = Math.ceil(total / limit);
+
+            setPaginacion({
+              paginaActual: currentPage,
+              totalPaginas: totalPages,
+              porPagina: limit,
+              totalItems: total,
+              anteriorPageUrl:
+                currentPage > 1
+                  ? `${urlApi}list/${currentPage - 1}/${limit}`
+                  : null,
+              siguienteUrl:
+                currentPage < totalPages
+                  ? `${urlApi}list/${currentPage + 1}/${limit}`
+                  : null,
+              primeraUrl: `${urlApi}list/1/${limit}`,
+              ultimaUrl: `${urlApi}list/${totalPages}/${limit}`,
+            });
+          }
+        } else {
+          throw new Error("Estructura de datos inesperada");
+        }
+      } catch (error) {
+        setError(`Error: ${error.message}`);
+        console.error("Error en paginación:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [paginacion.porPagina, urlApi],
+  );
+  const fetchInitialData = useCallback(async () => {
+    await handlePageChange(1);
+  }, [handlePageChange]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [refresh, fetchInitialData]);
   return (
     <>
       <Dialog open={open} size="lg" handler={handleOpen}>
@@ -68,7 +145,7 @@ export function Medicamentos() {
               <PhoneIcon className="h-5 w-5 text-blue-gray" />{" "}
             </Step>
           </Stepper>
-          <FormMedicamento activeStep={activeStep} />
+          <FormMedicamento activeStep={activeStep} setRefresh={setRefresh} stateModal={setOpen} urlApi={urlApi}  />
         </DialogBody>
         <DialogFooter className="mt-10 flex justify-between">
           <Button onClick={handlePrev} disabled={isFirstStep}>
@@ -106,7 +183,17 @@ export function Medicamentos() {
           </IconButton>
         </Tooltip>
       </div>
-      <ListMedicamentos></ListMedicamentos>
+      <ListMedicamentos
+        urlApi={urlApi}
+        medicamentos={medicamentos}
+        loading={loading}
+        error={error}
+        buscar={buscar}
+        paginacion={paginacion}
+        setBusqueda={setBusqueda}
+        handlePageChange={handlePageChange}
+        onRefresh={setRefresh}
+      ></ListMedicamentos>
     </>
   );
 }

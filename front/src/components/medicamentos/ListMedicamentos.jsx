@@ -15,67 +15,105 @@ import {
   MenuHandler,
   MenuItem,
   MenuList,
+  Button
 } from "@material-tailwind/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import FormUpdaMedicamento from "./FormUpdaMedicamento";
 import axios from "axios";
 
-const ListMedicamentos = () => {
+const ListMedicamentos = ({
+  urlApi,
+  medicamentos,
+  loading,
+  error,
+  buscar,
+  paginacion,
+  handlePageChange,
+  setBusqueda,
+  onRefresh,
+}) => {
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
-  const [buscar, setBusqueda] = useState("");
-  const [update, setUpdate] = useState([]);
-  const [staOrder, setStateOrde] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [detalles, setMedicamentoSelect] = useState(null);
-  const [medicamento, setMedicamento] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const urlApi = "http://127.0.0.1:3000/api/medicaments/";
-
-  const fetchMedicamentos = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get(urlApi + "list");
-      if (
-        response.data &&
-        response.data.data &&
-        Array.isArray(response.data.data)
-      ) {
-        setMedicamento(response.data.data);
-      } else {
-        setError("La respuesta de la API no es la qué se esperaba.");
-        setMedicamento([]);
-      }
-    } catch (error) {
-      setError("Error al obtener los medicamentos: " + error.message);
-      setMedicamento([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [urlApi]);
-
-  useEffect(() => {
-    fetchMedicamentos();
-  }, [fetchMedicamentos, refresh]);
-
-  const busqueda = medicamento.filter((medicamento) =>
+  const [detalles, setdetalles] = useState(null);
+  const busqueda = medicamentos.filter((medicamento) =>
     medicamento.nombre.toLowerCase().includes(buscar.toLowerCase()),
   );
 
   const handleOpen = (codigo, action) => {
-    let info = medicamento.find((medicamento) => medicamento.codigo === codigo);
+    let info = medicamentos.find(
+      (medicamento) => medicamento.codigo === codigo,
+    );
     action === "edit" ? setOpen2(!open2) : setOpen(!open);
-    setMedicamentoSelect(info);
+    setdetalles(info);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setMedicamentoSelect(null);
+    setdetalles(null);
   };
+  const renderPaginationControls = () => (
+    <div className="flex flex-wrap justify-center gap-2 mt-4">
+      {/* Primera Página */}
+      <Button
+        disabled={paginacion.paginaActual === 1}
+        onClick={() => handlePageChange(paginacion.primeraUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.paginaActual === 1 ? "gray" : "blue"}
+      >
+        « Primera
+      </Button>
 
-  const handleEdit = useCallback(
+      {/* Anterior */}
+      <Button
+        disabled={!paginacion.anteriorPageUrl}
+        onClick={() => handlePageChange(paginacion.anteriorPageUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.anteriorPageUrl ? "blue" : "gray"}
+      >
+        ‹ Anterior
+      </Button>
+
+      {/* Paginas */}
+      {Array.from({ length: paginacion.totalPaginas }, (_, i) => i + 1).map(
+        (page) => (
+          <Button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`w-10 h-10 p-0 rounded-full mx-1 ${
+              page === paginacion.paginaActual
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {page}
+          </Button>
+        ),
+      )}
+
+      {/* Siguiente */}
+      <Button
+        disabled={!paginacion.siguienteUrl}
+        onClick={() => handlePageChange(paginacion.siguienteUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.siguienteUrl ? "blue" : "gray"}
+      >
+        Siguiente ›
+      </Button>
+
+      {/* Última Página */}
+      <Button
+        disabled={paginacion.paginaActual === paginacion.totalPaginas}
+        onClick={() => handlePageChange(paginacion.ultimaUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={
+          paginacion.paginaActual === paginacion.totalPaginas ? "gray" : "blue"
+        }
+      >
+        Última »
+      </Button>
+    </div>
+  );
+  /*   const handleEdit = useCallback(
     async (data) => {
       if (typeof data === "object") {
         const { id, ...formUpdate } = data;
@@ -121,19 +159,7 @@ const ListMedicamentos = () => {
       }
     },
     [refresh, urlApi],
-  );
-
-  useEffect(() => {
-    if (staOrder) {
-      handleEdit(update);
-      setStateOrde(false);
-    }
-  }, [staOrder, update, handleEdit]);
-
-  const handleClose2 = () => {
-    setOpen2(false);
-    setMedicamentoSelect(null);
-  };
+  ); */
 
   const handleDelete = useCallback(
     async (id) => {
@@ -150,7 +176,7 @@ const ListMedicamentos = () => {
         if (result.isConfirmed) {
           try {
             await axios.post(urlApi + "delet", { id });
-            setRefresh(!refresh);
+            onRefresh(true);
             Swal.fire({
               title: "Eliminado",
               text: "El medicamento ha sido eliminado",
@@ -165,7 +191,7 @@ const ListMedicamentos = () => {
         }
       });
     },
-    [refresh, urlApi],
+    [urlApi],
   );
 
   return (
@@ -214,13 +240,13 @@ const ListMedicamentos = () => {
         </Dialog>
       )}
       {detalles && (
-        <Dialog open={open2} size="lg" handler={handleClose2}>
+        <Dialog open={open2} size="lg" handler={handleClose}>
           <DialogHeader>
             <IconButton
               size="sm"
               variant="text"
               className="!absolute right-3.5 top-3.7"
-              onClick={handleClose2}
+              onClick={handleClose}
             >
               <XMarkIcon className="h-5 w-5 stroke-2" />
             </IconButton>
@@ -228,8 +254,9 @@ const ListMedicamentos = () => {
           <DialogBody divider className="flex flex-col gap-4">
             <FormUpdaMedicamento
               dataForm={detalles}
-              setFormulario={setUpdate}
-              setStateOrder={setStateOrde}
+              setRefresh={onRefresh}
+              stateModal={setOpen2}
+              urlApi={urlApi}
             />
           </DialogBody>
         </Dialog>
@@ -277,10 +304,10 @@ const ListMedicamentos = () => {
           </div>
         </div>
       </div>
-      {loading && <Typography>Cargando medicamentos...</Typography>}
+      {loading && <Typography>Cargando medicos...</Typography>}
       {error && <Typography color="red">{error}</Typography>}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-11">
-        {medicamento.length > 0 &&
+        {busqueda.length > 0 &&
           busqueda.map((medicamento) => (
             <Card className="w-96 shadow-lg relative" key={medicamento.codigo}>
               <CardHeader
@@ -425,6 +452,9 @@ const ListMedicamentos = () => {
               </CardBody>
             </Card>
           ))}
+      </div>
+      <div className="flex justify-center mt-4">
+        {paginacion.totalPaginas > 1 && renderPaginationControls()}
       </div>
     </>
   );

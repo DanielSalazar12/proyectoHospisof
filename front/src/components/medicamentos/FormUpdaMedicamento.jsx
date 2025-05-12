@@ -17,11 +17,14 @@ import {
   Textarea,
 } from "@material-tailwind/react";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 export default function FormUpdaMedicamento({
   dataForm,
-  setFormulario,
-  setStateOrder,
+  setRefresh,
+  urlApi,
+  stateModal,
 }) {
   const [type, setType] = useState("general");
   const [form, setForm] = useState(dataForm);
@@ -82,9 +85,56 @@ export default function FormUpdaMedicamento({
       img: form.img,
     };
     console.log("Formulario enviado");
-    setFormulario(datos);
-    setStateOrder(true);
+    handleEdit(datos);
   };
+  const handleEdit = useCallback(
+    async (data) => {
+      if (typeof data === "object") {
+        const { id, ...formUpdate } = data;
+        const formData = new FormData();
+        Object.entries(formUpdate).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
+
+        try {
+          const response = await axios.put(
+            urlApi + "update/" + data.id,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            },
+          );
+
+          if (response.data.estado === true) {
+            setRefresh(true);
+            stateModal(false);
+            Swal.fire({
+              title: "Actualizado",
+              text: "El medicamento se ha actualizado",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1700,
+            });
+          } else {
+            Swal.fire({
+              title: "Error",
+              text: "No se pudo actualizar el medicamento",
+              icon: "error",
+              showConfirmButton: false,
+            });
+          }
+        } catch (error) {
+          Swal.fire("Error", "Ocurrió un problema", "error");
+          console.error("Update error:", error);
+        }
+      } else {
+        console.log("No es un Object :", data);
+      }
+    },
+    [urlApi],
+  );
   return (
     <form onSubmit={handleSubmit}>
       <Card className="w-full">

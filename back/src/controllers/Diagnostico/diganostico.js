@@ -2,43 +2,57 @@
 import Diagnostico from "../../models/Diagnostico/diagnostico.js";
 import Patients from "../../models/Paciente/patient.js";
 
-export const getAll = async (documento) => {
-  const paciente = await Patients.findOne({ documento: Number(documento) });
-  if (!paciente) {
-    return {
-      estado: false,
-      mensaje: `El paciente no Existe en el sistema`
-    };
-  }
-  try {
-    const listaDiagnosticos = await Diagnostico.aggregate([
-      { $match: { status: "1" } },
-      {
-        $lookup: {
-          //$lookup : para unir con la colección patients
-          from: "pacientes",
-          localField: "patientId",
-          foreignField: "_id",
-          as: "patient"
+export const getAll = async (documento, limit, page) => {
+  const paginaActual = parseInt(page) || 1;
+  const porPagina = parseInt(limit) || 3;
+
+  if (documento) {
+    try {
+      const paciente = await Patients.findOne({ documento: Number(documento) });
+      if (!paciente) {
+        return {
+          estado: false,
+          mensaje: `El paciente no existe en el sistema`
+        };
+      }
+
+      const totalElementos = await Diagnostico.countDocuments({
+        patientId: paciente._id,
+        status: "1"
+      });
+      const totalPaginas = Math.ceil(totalElementos / porPagina);
+
+      const listaDiagnosticos = await Diagnostico.find({ patientId: paciente._id, status: "1" })
+        .skip((paginaActual - 1) * porPagina)
+        .limit(porPagina);
+
+      return {
+        estado: true,
+        data: listaDiagnosticos,
+        paginacion: {
+          paginaActual,
+          totalPaginas,
+          porPagina,
+          totalElementos,
+          siguiente: paginaActual < totalPaginas ? paginaActual + 1 : null,
+          anterior: paginaActual > 1 ? paginaActual - 1 : null
         }
-      },
-      { $unwind: "$patient" }, // $unwind : convierte el array patient en un solo objeto
-      { $match: { "patient.documento": Number(documento) } } // filtra por documento
-    ]);
-    return {
-      estado: true,
-      data: listaDiagnosticos
-    };
-  } catch (error) {
-    return {
-      estado: false,
-      mensaje: `Error: ${error}`
-    };
+      };
+    } catch (error) {
+      return {
+        estado: false,
+        mensaje: `Error: ${error.message}`
+      };
+    }
   }
+
+  return {
+    estado: false,
+    mensaje: "Documento es requerido para la búsqueda"
+  };
 };
 
 export const add = async (data) => {
-
   try {
     const diagnosticoNuevo = new Diagnostico({
       fecha: data.fecha,

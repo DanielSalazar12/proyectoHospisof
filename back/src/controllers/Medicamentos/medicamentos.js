@@ -5,12 +5,38 @@ import fs from "fs";
 // modulo nativo de node util para manejar las rutas
 import path from "path";
 
-export const getAll = async () => {
+export const getAll = async (limit, page) => {
+  const baseUrl = `http://127.0.0.1:3000/api/medicaments/list`;
+
+  const paginaActual = parseInt(page) || 1;
+  const porPagina = parseInt(limit) || 10;
+
+  const totalElementos = await Medicamentos.countDocuments();
+  const totalPaginas = Math.ceil(totalElementos / porPagina);
+  const buildUrl = (page) => `${baseUrl}/${page}/${porPagina}`;
   try {
-    let listaMedicamentos = await Medicamentos.find({ status: 1 }).exec();
+    const medicos = await Medicamentos.find({ status: 1 })
+      .skip((paginaActual - 1) * porPagina)
+      .limit(porPagina);
+
+    const paginacion = {
+      paginaActual: paginaActual,
+      totalPaginas: totalPaginas,
+      porPagina: porPagina,
+      totalElementos: totalElementos,
+      siguiente: paginaActual < totalPaginas ? paginaActual + 1 : null,
+      anterior: paginaActual > 1 ? paginaActual - 1 : null,
+      primera: 1,
+      ultima: totalPaginas,
+      siguienteUrl: paginaActual < totalPaginas ? buildUrl(paginaActual + 1) : null,
+      anteriorPageUrl: paginaActual > 1 ? buildUrl(paginaActual - 1) : null,
+      primeraUrl: buildUrl(1),
+      ultimaUrl: buildUrl(totalPaginas)
+    };
     return {
       estado: true,
-      data: listaMedicamentos
+      data: medicos,
+      paginacion
     };
   } catch (error) {
     return {

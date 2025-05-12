@@ -1,11 +1,7 @@
 import express from "express";
 
 const router = express.Router();
-import {
-  getAll,
-  add,
-  deleteById,
-} from "../controllers/Diagnostico/diganostico.js";
+import { getAll, add, deleteById } from "../controllers/Diagnostico/diganostico.js";
 
 import { celebrate, Joi, errors } from "celebrate";
 const schema = Joi.object({
@@ -18,17 +14,20 @@ const schema = Joi.object({
   historia: Joi.string().required(),
   examenFisico: Joi.string().required(),
   evoClinica: Joi.string().required(),
-  medicamentos: Joi.array().items(Joi.string()).required(), // Array de strings JSON
+  medicamentos: Joi.array().items(Joi.string()).required() // Array de strings JSON
 });
 
-router.get("/diagnostico/list/:documento", async (req, res) => {
+router.get("/diagnostico/list/:documento/:page/:limit", async (req, res) => {
   try {
+    const page = parseInt(req.params.page || 1);
+    const limit = parseInt(req.params.limit || 10);
     const data = req.params.documento;
-    const response = await getAll(data);
+
+    const response = await getAll(data, limit, page);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
-      message: `Error al obtener los diganostico del paciente: ${data}`,
+      message: `Error al obtener los diganostico del paciente: ${data}`
     });
   }
 });
@@ -36,7 +35,7 @@ router.get("/diagnostico/list/:documento", async (req, res) => {
 router.post(
   "/diagnostico/create",
   celebrate({
-    body: schema,
+    body: schema
   }),
   async (req, res) => {
     try {
@@ -47,9 +46,7 @@ router.post(
           data.examenFisico = JSON.parse(data.examenFisico);
         } catch (error) {
           console.error("Error al parsear examenFisico:", error);
-          return res
-            .status(400)
-            .json({ message: "Formato inválido en examenFisico" });
+          return res.status(400).json({ message: "Formato inválido en examenFisico" });
         }
       }
 
@@ -59,9 +56,7 @@ router.post(
           data.medicamentos = data.medicamentos.map((item) => JSON.parse(item));
         } catch (error) {
           console.error("Error al parsear medicamentos:", error);
-          return res
-            .status(400)
-            .json({ message: "Formato inválido en medicamentos" });
+          return res.status(400).json({ message: "Formato inválido en medicamentos" });
         }
       }
 
@@ -71,7 +66,7 @@ router.post(
     } catch (error) {
       res.status(500).json({
         message: `Error al crear un diganostico`,
-        error: `${error}`,
+        error: `${error}`
       });
     }
   }
@@ -81,8 +76,8 @@ router.post(
   "/diagnostico/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required(),
-    }),
+      id: Joi.string().required()
+    })
   }),
   async (req, res) => {
     try {

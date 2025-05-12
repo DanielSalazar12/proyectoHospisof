@@ -43,9 +43,11 @@ const schema = Joi.object({
 });
 
 const uploads = multer({ storage });
-router.get("/medicaments/list", async (req, res) => {
+router.get("/medicaments/list/:page/:limit", async (req, res) => {
   try {
-    const response = await getAll();
+    const page = parseInt(req.params.page || 1);
+    const limit = parseInt(req.params.limit || 10);
+    const response = await getAll(limit, page);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la lista de medicamentos" });

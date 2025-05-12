@@ -38,7 +38,7 @@ export default function FormDiagnostico({ dataPaciente }) {
     observaciones: "",
   });
   const [formulario, setFormulario] = useState({
-    medicoId: "681a25e50db1d08e1f470876",
+    medicoId: "68225fd4ab03cd77f4e5686f",
     pacienteId: "",
     fecha: "",
     motivoConsulta: "",

@@ -46,7 +46,16 @@ export function Diagnostico() {
   const [paciente, setPaciente] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [pacienteValido, setPacienteValido] = useState(false);
-
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    totalPaginas: 1,
+    porPagina: 6,
+    totalItems: 0,
+    anteriorPageUrl: null,
+    siguienteUrl: null,
+    primeraUrl: `${urlApi}list/1/1/3`,
+    ultimaUrl: null,
+  });
   const handleOpen = (diagnosticoId) => {
     let info = diagnosticos.find((d) => d._id == diagnosticoId);
     setOpen(true);
@@ -79,7 +88,7 @@ export function Diagnostico() {
       setPacienteValido(true);
     }
   };
-  const handleBusqueda = async (documento) => {
+  /* const handleBusqueda = async (documento) => {
     try {
       const response = await axios.get(urlApi + `list/${documento}`);
       if (
@@ -99,7 +108,7 @@ export function Diagnostico() {
       setDiagnosticos([]);
     }
   };
-  const fetchPacientes = useCallback(async () => {
+   */ const fetchPacientes = useCallback(async () => {
     try {
       const response = await axios.get(urlApiPatients + "list");
       if (
@@ -120,9 +129,73 @@ export function Diagnostico() {
     }
   }, [urlApiPatients]);
 
+  const handlePageChange = useCallback(
+    async (target) => {
+      try {
+        setLoading(true);
+        setError(null);
+        let url;
+        if (typeof target === "number") {
+          url = `${urlApi}list/${documento}/${target}/${paginacion.porPagina}`;
+        } else if (typeof target === "string" && target.startsWith("http")) {
+          url = target;
+        } else {
+          url = `${urlApi}list/${documento}/1/${paginacion.porPagina}`;
+        }
+        const response = await axios.get(url);
+
+        if (response.data && response.data.estado) {
+          setDiagnosticos(response.data.data);
+          if (response.data.paginacion) {
+            setPaginacion(response.data.paginacion);
+          } else {
+            const total = response.data.total || response.data.data.length;
+            const limit = paginacion.porPagina;
+            const page = new URL(url).searchParams.get("page") || 1;
+            const currentPage = parseInt(page);
+            const totalPages = Math.ceil(total / limit);
+
+            setPaginacion({
+              paginaActual: currentPage,
+              totalPaginas: totalPages,
+              porPagina: limit,
+              totalItems: total,
+              anteriorPageUrl:
+                currentPage > 1
+                  ? `${urlApi}list/${currentPage - 1}/${limit}`
+                  : null,
+              siguienteUrl:
+                currentPage < totalPages
+                  ? `${urlApi}list/${currentPage + 1}/${limit}`
+                  : null,
+              primeraUrl: `${urlApi}list/1/${limit}`,
+              ultimaUrl: `${urlApi}list/${totalPages}/${limit}`,
+            });
+          }
+        } else {
+          throw new Error("Estructura de datos inesperada");
+        }
+      } catch (error) {
+        setError(`Error: ${error.message}`);
+        console.error("Error en paginación:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [paginacion.porPagina, urlApi],
+  );
+  const fetchInitialData = useCallback(async () => {
+    await handlePageChange(1);
+  }, [handlePageChange]);
+
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
+  
+  useEffect(() => {
+    fetchInitialData();
+  }, [refresh, fetchInitialData]);
+
   return (
     <>
       {diagnostico && (

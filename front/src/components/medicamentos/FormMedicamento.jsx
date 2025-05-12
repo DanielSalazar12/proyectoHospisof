@@ -7,10 +7,11 @@ import {
   Button,
   Card,
 } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
-import { useFormMedicamento } from "@/hooks/useFormMedicamento";
+import { useState, useCallback } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
-const FormMedicamento = ({ activeStep }) => {
+const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
   const [formulario, setFormData] = useState({
     nombre: "",
     administracion: "",
@@ -27,8 +28,6 @@ const FormMedicamento = ({ activeStep }) => {
     vencimiento: "",
   });
   const [imagen, setImagen] = useState(null);
-
-  const [medicamentoCreado, setMedicamentoCreado] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,15 +65,6 @@ const FormMedicamento = ({ activeStep }) => {
     )}-${formulario.formaFarma.substring(0, 3).toUpperCase()}`;
   };
 
-  const { medicamento } = useFormMedicamento(medicamentoCreado);
-
-  useEffect(() => {
-    if (medicamento) {
-      setFormData({});
-      setImagen(null);
-    }
-  }, [medicamento]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -93,10 +83,62 @@ const FormMedicamento = ({ activeStep }) => {
     formData.append("prCompra", formulario.prCompra);
     formData.append("prVenta", formulario.prVenta);
     formData.append("img", formulario.img);
-    setMedicamentoCreado(formData);
+    hadleInsert(formData);
     console.log("Formulario enviado");
   };
+  const hadleInsert = useCallback(
+    async (data) => {
+      if (typeof data === "object") {
+        try {
+          const response = await axios.post(urlApi + "create/", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
 
+          if (response.data.estado === true) {
+            setRefresh(true);
+            stateModal(false);
+            Swal.fire({
+              title: "Registrado",
+              text: response.data.mensaje,
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1700,
+            });
+            setFormData({
+              nombre: "",
+              administracion: "",
+              img: "",
+              presentacion: "",
+              medida: "",
+              formaFarma: "",
+              descripcion: "",
+              concentracion: "",
+              envase: "",
+              prCompra: 0,
+              prVenta: 0,
+              stock: 0,
+              vencimiento: "",
+            });
+          } else {
+            Swal.fire({
+              title: "Error",
+              text: "No se pudo Registrar el medico",
+              icon: "error",
+              showConfirmButton: false,
+            });
+          }
+        } catch (error) {
+          Swal.fire("Error", "Ocurrió un problema", "error");
+          console.error("Update error:", error);
+        }
+      } else {
+        console.log("No es un Object :", data);
+      }
+    },
+    [setRefresh, urlApi],
+  );
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -119,7 +161,6 @@ const FormMedicamento = ({ activeStep }) => {
                 value={formulario.nombre}
                 onChange={handleChange}
                 className="placeholder:opacity-100 focus:!border-t-gray-900"
-              
                 containerProps={{
                   className: "!min-w-full",
                 }}
