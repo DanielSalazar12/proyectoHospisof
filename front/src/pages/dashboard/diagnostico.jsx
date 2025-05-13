@@ -31,7 +31,8 @@ import { useState, useCallback, useEffect } from "react";
 import { conversationsData } from "@/data";
 import axios from "axios";
 import FormDiagnostico from "@/components/diagnosticos/FormDiagnostico";
-const urlApi = "http://127.0.0.1:3000/api/diagnostico/";
+
+const urlApi = "http://127.0.0.1:3000/api/diagnostic/";
 const urlApiPatients = "http://127.0.0.1:3000/api/patient/";
 
 export function Diagnostico() {
@@ -39,6 +40,9 @@ export function Diagnostico() {
   const [type, setType] = useState("Busqueda");
   const [refresh, setRefresh] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [documento, setDocumento] = useState("");
 
   const [diagnosticos, setDiagnosticos] = useState([]); // Diagnosticos del pacientes
   const [diagnostico, setDiagnostico] = useState(null); // Diagnostico seleccionado para ver la informacion
@@ -49,11 +53,11 @@ export function Diagnostico() {
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     totalPaginas: 1,
-    porPagina: 6,
+    porPagina: 3,
     totalItems: 0,
     anteriorPageUrl: null,
     siguienteUrl: null,
-    primeraUrl: `${urlApi}list/1/1/3`,
+    primeraUrl: `${urlApi}list/${documento}/1/3`,
     ultimaUrl: null,
   });
   const handleOpen = (diagnosticoId) => {
@@ -84,11 +88,12 @@ export function Diagnostico() {
       setPaciente([]);
     } else {
       setPaciente(patient);
-      handleBusqueda(busqueda);
+      setDocumento(patient.documento);
       setPacienteValido(true);
     }
   };
-  /* const handleBusqueda = async (documento) => {
+
+  /*   const handleBusqueda = async (documento) => {
     try {
       const response = await axios.get(urlApi + `list/${documento}`);
       if (
@@ -107,8 +112,8 @@ export function Diagnostico() {
       );
       setDiagnosticos([]);
     }
-  };
-   */ const fetchPacientes = useCallback(async () => {
+  }; */
+  const fetchPacientes = useCallback(async () => {
     try {
       const response = await axios.get(urlApiPatients + "list");
       if (
@@ -137,10 +142,14 @@ export function Diagnostico() {
         let url;
         if (typeof target === "number") {
           url = `${urlApi}list/${documento}/${target}/${paginacion.porPagina}`;
+          console.log(" if:", documento, " ulr", url);
         } else if (typeof target === "string" && target.startsWith("http")) {
           url = target;
+          console.log("else if:", documento, " ulr", url);
         } else {
           url = `${urlApi}list/${documento}/1/${paginacion.porPagina}`;
+          console.log("else ", documento, " ulr", url);
+
         }
         const response = await axios.get(url);
 
@@ -173,6 +182,7 @@ export function Diagnostico() {
             });
           }
         } else {
+          setLoading(false);
           throw new Error("Estructura de datos inesperada");
         }
       } catch (error) {
@@ -184,6 +194,7 @@ export function Diagnostico() {
     },
     [paginacion.porPagina, urlApi],
   );
+
   const fetchInitialData = useCallback(async () => {
     await handlePageChange(1);
   }, [handlePageChange]);
@@ -191,11 +202,73 @@ export function Diagnostico() {
   useEffect(() => {
     fetchPacientes();
   }, [fetchPacientes, refresh]);
-  
+
   useEffect(() => {
     fetchInitialData();
   }, [refresh, fetchInitialData]);
 
+  const renderPaginationControls = () => (
+    <div className="flex flex-wrap justify-center gap-2 mt-4">
+      {/* Primera Página */}
+      <Button
+        disabled={paginacion.paginaActual === 1}
+        onClick={() => handlePageChange(paginacion.primeraUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.paginaActual === 1 ? "gray" : "blue"}
+      >
+        « Primera
+      </Button>
+
+      {/* Anterior */}
+      <Button
+        disabled={!paginacion.anteriorPageUrl}
+        onClick={() => handlePageChange(paginacion.anteriorPageUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.anteriorPageUrl ? "blue" : "gray"}
+      >
+        ‹ Anterior
+      </Button>
+
+      {/* Paginas */}
+      {Array.from({ length: paginacion.totalPaginas }, (_, i) => i + 1).map(
+        (page) => (
+          <Button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`w-10 h-10 p-0 rounded-full mx-1 ${
+              page === paginacion.paginaActual
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {page}
+          </Button>
+        ),
+      )}
+
+      {/* Siguiente */}
+      <Button
+        disabled={!paginacion.siguienteUrl}
+        onClick={() => handlePageChange(paginacion.siguienteUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={paginacion.siguienteUrl ? "blue" : "gray"}
+      >
+        Siguiente ›
+      </Button>
+
+      {/* Última Página */}
+      <Button
+        disabled={paginacion.paginaActual === paginacion.totalPaginas}
+        onClick={() => handlePageChange(paginacion.ultimaUrl)}
+        className="flex items-center gap-1 px-3 py-1 rounded-full"
+        color={
+          paginacion.paginaActual === paginacion.totalPaginas ? "gray" : "blue"
+        }
+      >
+        Última »
+      </Button>
+    </div>
+  );
   return (
     <>
       {diagnostico && (
@@ -413,6 +486,9 @@ export function Diagnostico() {
                   </Typography>
 
                   <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
+                    {loading && (
+                      <Typography>Cargando diagnosticos...</Typography>
+                    )}
                     {diagnosticos.map(
                       ({
                         _id,
@@ -493,6 +569,7 @@ export function Diagnostico() {
                       ),
                     )}
                   </div>
+                  {renderPaginationControls()}
                 </div>
               </TabPanel>
               <TabPanel value="Diagnostico">

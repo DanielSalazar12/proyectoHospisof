@@ -145,7 +145,12 @@ export function Medicamentos() {
               <PhoneIcon className="h-5 w-5 text-blue-gray" />{" "}
             </Step>
           </Stepper>
-          <FormMedicamento activeStep={activeStep} setRefresh={setRefresh} stateModal={setOpen} urlApi={urlApi}  />
+          <FormMedicamento
+            activeStep={activeStep}
+            setRefresh={setRefresh}
+            stateModal={setOpen}
+            urlApi={urlApi}
+          />
         </DialogBody>
         <DialogFooter className="mt-10 flex justify-between">
           <Button onClick={handlePrev} disabled={isFirstStep}>

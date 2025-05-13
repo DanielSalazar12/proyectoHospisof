@@ -17,7 +17,7 @@ const schema = Joi.object({
   medicamentos: Joi.array().items(Joi.string()).required() // Array de strings JSON
 });
 
-router.get("/diagnostico/list/:documento/:page/:limit", async (req, res) => {
+router.get("/diagnostic/list/:documento/:page/:limit", async (req, res) => {
   try {
     const page = parseInt(req.params.page || 1);
     const limit = parseInt(req.params.limit || 10);
@@ -33,7 +33,7 @@ router.get("/diagnostico/list/:documento/:page/:limit", async (req, res) => {
 });
 
 router.post(
-  "/diagnostico/create",
+  "/diagnostic/create",
   celebrate({
     body: schema
   }),
@@ -59,9 +59,7 @@ router.post(
           return res.status(400).json({ message: "Formato inválido en medicamentos" });
         }
       }
-
-      console.log("Datos procesados:", data);
-      const response = await add(data);
+     const response = await add(data);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({
@@ -73,7 +71,7 @@ router.post(
 );
 
 router.post(
-  "/diagnostico/delet",
+  "/diagnostic/delet",
   celebrate({
     body: Joi.object({
       id: Joi.string().required()

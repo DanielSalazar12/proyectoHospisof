@@ -182,6 +182,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="administracion"
                   value={formulario.administracion}
+                  required
                   onChange={(option) =>
                     handleSelectChange("administracion", option)
                   }
@@ -218,6 +219,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   placeholder="1"
                   name="presentacion"
                   value={formulario.presentacion}
+                  required
                   onChange={(option) =>
                     handleSelectChange("presentacion", option)
                   }
@@ -258,6 +260,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   name="medida"
                   value={formulario.medida}
                   onChange={(option) => handleSelectChange("medida", option)}
+                  required
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 bg-white text-gray-800 focus:!border-primary"
                 >
                   {/* Unidades de masa */}
@@ -296,6 +299,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                 <Select
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="formaFarma"
+                  required
                   value={formulario.formaFarma}
                   onChange={(option) =>
                     handleSelectChange("formaFarma", option)
@@ -342,6 +346,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   size="lg"
                   placeholder="eg. Tablestas | Capsulas"
                   name="descripcion"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                   value={formulario.descripcion}
                   onChange={handleChange}
@@ -370,6 +375,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                 <Input
                   color="gray"
                   size="lg"
+                  required
                   placeholder="eg. <8.8oz | 250g"
                   name="concentracion"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -389,6 +395,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-dark-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   placeholder="1"
                   name="envase"
+                  required
                   value={formulario.envase}
                   onChange={(option) => handleSelectChange("envase", option)}
                 >
@@ -426,6 +433,8 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   name="prCompra"
                   value={formulario.prCompra}
                   onChange={handleChange}
+                  requireds
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -446,6 +455,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   value={formulario.prVenta}
                   onChange={handleChange}
                   type="number"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -467,6 +477,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   name="stock"
                   value={formulario.stock}
                   onChange={handleChange}
+                  required
                   icon={<i className="fa-solid fa-box text-gray-500" />}
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
@@ -488,6 +499,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   value={formulario.vencimiento}
                   onChange={handleChange}
                   type="date"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -509,6 +521,7 @@ const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
                   type="file"
                   name="img"
                   accept="image/.png, image/jpeg, image/jpg"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900  "
                   icon={<i className="fa-solid fa-image text-gray-500" />}
                   onChange={handleImageChange}

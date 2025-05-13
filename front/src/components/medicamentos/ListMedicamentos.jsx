@@ -15,7 +15,7 @@ import {
   MenuHandler,
   MenuItem,
   MenuList,
-  Button
+  Button,
 } from "@material-tailwind/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import FormUpdaMedicamento from "./FormUpdaMedicamento";
@@ -35,6 +35,7 @@ const ListMedicamentos = ({
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const [detalles, setdetalles] = useState(null);
+  
   const busqueda = medicamentos.filter((medicamento) =>
     medicamento.nombre.toLowerCase().includes(buscar.toLowerCase()),
   );
@@ -113,53 +114,6 @@ const ListMedicamentos = ({
       </Button>
     </div>
   );
-  /*   const handleEdit = useCallback(
-    async (data) => {
-      if (typeof data === "object") {
-        const { id, ...formUpdate } = data;
-        const formData = new FormData();
-        Object.entries(formUpdate).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
-
-        try {
-          const response = await axios.put(
-            urlApi + "update/" + data.id,
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            },
-          );
-
-          if (response.data.estado === true) {
-            setRefresh(!refresh);
-            Swal.fire({
-              title: "Actualizado",
-              text: "El medicamento se ha actualizado",
-              icon: "success",
-              showConfirmButton: false,
-              timer: 1700,
-            });
-          } else {
-            Swal.fire({
-              title: "Error",
-              text: "No se pudo actualizar el medicamento",
-              icon: "error",
-              showConfirmButton: false,
-            });
-          }
-        } catch (error) {
-          Swal.fire("Error", "Ocurrió un problema", "error");
-          console.error("Update error:", error);
-        }
-      } else {
-        console.log("No es un Object :", data);
-      }
-    },
-    [refresh, urlApi],
-  ); */
 
   const handleDelete = useCallback(
     async (id) => {

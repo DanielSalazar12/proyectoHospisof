@@ -3,9 +3,11 @@ import Diagnostico from "../../models/Diagnostico/diagnostico.js";
 import Patients from "../../models/Paciente/patient.js";
 
 export const getAll = async (documento, limit, page) => {
+  const baseUrl = `http://127.0.0.1:3000/api/diagnostic/list`;
+
   const paginaActual = parseInt(page) || 1;
   const porPagina = parseInt(limit) || 3;
-
+  const buildUrl = (page) => `${baseUrl}/${page}/${porPagina}`;
   if (documento) {
     try {
       const paciente = await Patients.findOne({ documento: Number(documento) });
@@ -15,7 +17,6 @@ export const getAll = async (documento, limit, page) => {
           mensaje: `El paciente no existe en el sistema`
         };
       }
-
       const totalElementos = await Diagnostico.countDocuments({
         patientId: paciente._id,
         status: "1"
@@ -30,12 +31,18 @@ export const getAll = async (documento, limit, page) => {
         estado: true,
         data: listaDiagnosticos,
         paginacion: {
-          paginaActual,
-          totalPaginas,
-          porPagina,
-          totalElementos,
+          paginaActual: paginaActual,
+          totalPaginas: totalPaginas,
+          porPagina: porPagina,
+          totalElementos: totalElementos,
           siguiente: paginaActual < totalPaginas ? paginaActual + 1 : null,
-          anterior: paginaActual > 1 ? paginaActual - 1 : null
+          anterior: paginaActual > 1 ? paginaActual - 1 : null,
+          primera: 1,
+          ultima: totalPaginas,
+          siguienteUrl: paginaActual < totalPaginas ? buildUrl(paginaActual + 1) : null,
+          anteriorPageUrl: paginaActual > 1 ? buildUrl(paginaActual - 1) : null,
+          primeraUrl: buildUrl(1),
+          ultimaUrl: buildUrl(totalPaginas)
         }
       };
     } catch (error) {
