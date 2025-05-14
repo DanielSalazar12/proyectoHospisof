@@ -3,7 +3,8 @@ import { Types } from "mongoose";
 
 const getAll = async (req, res) => {
   try {
-    let listaCita = await Citas.find().exec();
+    let listaCita = await Citas.find().populate("medicoId").populate("pacienteId").
+      exec();
     res.status(200).send({
       exito: true,
       listaCita,
@@ -36,7 +37,7 @@ export const nuevo = async (req, res) => {
     return res.send({
       estado: true,
       mensaje: "Inserción exitosa",
-      usuario: usuarioNuevo,
+      usuario: citaNuevo,
     });
   } catch (error) {
     return res.send({
@@ -48,4 +49,5 @@ export const nuevo = async (req, res) => {
 
 export default {
   getAll,
+  nuevo,
 };

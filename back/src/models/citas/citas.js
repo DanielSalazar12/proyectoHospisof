@@ -4,7 +4,7 @@ const citasSchema = new Schema(
   {
     pacienteId: {
       type: Types.ObjectId,
-      ref: "pacientes",
+      ref: "Patients",
       required: true,
     },
     medicoId: {

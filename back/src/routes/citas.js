@@ -5,6 +5,7 @@ const router = express.Router();
 
 // Rutas que entrega la API
 router.get("/citas/listartodos", citasController.getAll);
+router.post("/citas/nuevo", citasController.nuevo);
 
 //router.post("/usuario/login", usuarioController.login);
 
