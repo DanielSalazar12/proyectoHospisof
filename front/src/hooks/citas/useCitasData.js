@@ -5,7 +5,7 @@ import axios from "axios";
 export const fetchCitas = async () => {
     try {
         const res = await axios.get("http://localhost:3000/api/citas/listartodos");
-        return res.data.listaCitas || [];
+        return res.data.listaCita || [];
     } catch (err) {
         console.error("Error al cargar citas:", err);
         return [];

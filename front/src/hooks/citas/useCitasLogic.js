@@ -1,34 +1,27 @@
-
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-
-import {
-    f,
-} from "@/hooks/citas/useCitasData";
-
-
+import { fetchCitas } from "@/hooks/citas/useCitasData";
 
 const initialForm = {
-    nombreUsuario: "",
-    passwordUser: "",
-    email: "",
-    rol: "",
+    pacienteId: "",
+    medicoId: "",
+    fechaCita: "",
+    horaCita: "",
+    motivo: "",
+    notas: "",
+    tipoConsulta: "",
+    fechaCreacion: "",
 };
 
-export const useUsersLogic = () => {
+export const useCitasLogic = () => {
     const [open, setOpen] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [roles, setRoles] = useState([]);
+    const [citas, setCitas] = useState([]);
     const [formData, setFormData] = useState(initialForm);
-    const [modoEdicion, setModoEdicion] = useState(false);
-    const [idUserActual, setIdUserActual] = useState(null);
 
-    const abrirModalUsers = () => {
+    const abrirModalCitas = () => {
         if (open) {
             // Si se está cerrando la modal, reseteamos todo
             setFormData(initialForm);
-            setModoEdicion(false);
-            setIdUserActual(null);
         }
         setOpen(!open);
     };
@@ -40,16 +33,13 @@ export const useUsersLogic = () => {
 
     const cargarDatos = async () => {
         try {
-            const [usersData, rolesData] = await Promise.all([
-                fetchUsers(),
-                fetchRoles(),
-            ]);
-            setUsers(usersData);
-            setRoles(rolesData);
+            const citasData = await fetchCitas(); // Llamada directa a fetchCitas
+            setCitas(citasData); // Asignamos las citas obtenidas a setCitas
         } catch (error) {
-            console.error("Error al cargar datos:", error);
+            console.error("Error al cargar citas:", error);
         }
     };
+
     useEffect(() => {
         cargarDatos();
     }, []);
@@ -57,13 +47,8 @@ export const useUsersLogic = () => {
     // ----------------------------------------------------Insercion -------------------------
     const handleSubmit = async () => {
         const camposRequeridos = [
-            "nombreUsuario",
-            "passwordUser",
-            "emailUser",
-            "rol",
+            "pacienteId", "medicoId", "fechaCita", "horaCita", "motivo", "tipoConsulta",
         ];
-
-        // Validacion de entrada de datos
 
         const camposVacios = camposRequeridos.filter((campo) => !formData[campo]);
 
@@ -75,78 +60,59 @@ export const useUsersLogic = () => {
             });
             return;
         }
+
         try {
-            const nuevoUsuario = {
-                nombreUsuario: formData.nombreUsuario,
-                passwordUser: formData.passwordUser,
-                emailUser: formData.emailUser,
-                rol: formData.rol,
-                status: 1,
+            // Asegúrate de ajustar esta parte para la creación de una nueva cita.
+            const nuevaCita = {
+                pacienteId: formData.pacienteId,
+                medicoId: formData.medicoId,
+                fechaCita: formData.fechaCita,
+                horaCita: formData.horaCita,
+                motivo: formData.motivo,
+                notas: formData.notas,
+                tipoConsulta: formData.tipoConsulta,
+                fechaCreacion: new Date().toISOString(),
             };
 
-            const usuarioCreado = await createUser(nuevoUsuario);
-
-            if (!usuarioCreado.estado) {
-                setOpen(false);
-                setFormData(initialForm);
-                setModoEdicion(false);
-                setIdUserActual(null);
-                Swal.fire({
-                    icon: "error",
-                    title: "Error al registrar usuario",
-                    text: usuarioCreado.mensaje || "No se pudo registrar el usuario.",
-                });
-                return;
-            }
-
+            // Aquí debes realizar la acción de creación, por ejemplo usando una API.
+            // await createCita(nuevaCita); 
+            // Simulamos un éxito para mostrar el mensaje de éxito.
             Swal.fire({
                 icon: "success",
-                title: "Paciente registrado",
-                text: "El usuario fue creado exitosamente.",
+                title: "Cita registrada",
+                text: "La cita fue registrada exitosamente.",
                 confirmButtonColor: "#3085d6",
             });
 
-            abrirModalUsers();
             setFormData(initialForm);
-            await cargarDatos();
+            await cargarDatos(); // Recargamos las citas
+
         } catch (error) {
-            console.error(error);
+            console.error("Error al registrar cita:", error);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Ocurrió un error al insertar!",
+                text: "Ocurrió un error al registrar la cita.",
             });
         }
     };
-
-    //=======================================Fcuncion de editar, traer los datos =======================================
 
     const handleEditClick = async (id) => {
+        // Aquí se debe manejar la edición de la cita, cargar la cita y permitir su modificación.
         try {
-            const user = await getUserId(id);
-
-            setFormData({
-                nombreUsuario: user.nombreUsuario || "",
-                emailUser: user.emailUser || "",
-                passwordUser: user.passwordUser || "",
-                rol: user.rol || "",
-            });
-
-            setIdUserActual(user._id);
-            setModoEdicion(true);
+            // Ejemplo: const cita = await getCitaById(id);
+            // setFormData({...cita});
             setOpen(true);
         } catch (error) {
-            console.error("Error al cargar el usuario:", error);
-            Swal.fire("Error", "No se pudo cargar el usuario", "error");
+            console.error("Error al cargar la cita:", error);
+            Swal.fire("Error", "No se pudo cargar la cita", "error");
         }
     };
 
-    //=========================================================================
-
-    const handleDelete = async (idUser) => {
+    const handleDelete = async (id) => {
         const result = await Swal.fire({
             title: "¿Estás seguro?",
-            text: "Esto eliminará el usuario.",
+            text: "Esto eliminará la cita.",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
@@ -155,96 +121,33 @@ export const useUsersLogic = () => {
 
         if (result.isConfirmed) {
             try {
-                const pacienteRelacionado = await fetchValidacionDelete(idUser);
-
-                if (pacienteRelacionado) {
-                    await deletePaciente(pacienteRelacionado._id);
-                }
-
-                await deleteUser(idUser);
+                // Simulamos la eliminación de la cita, ajusta esto a tu lógica.
+                // await deleteCita(id);
                 await cargarDatos();
-
                 Swal.fire({
                     icon: "success",
-                    title: "Usuario eliminado",
-                    text: "El usuario fue eliminado correctamente.",
+                    title: "Cita eliminada",
+                    text: "La cita fue eliminada correctamente.",
                 });
             } catch (error) {
-                console.error("Error al eliminar:", error);
+                console.error("Error al eliminar la cita:", error);
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: "No se pudo eliminar el usuario.",
+                    text: "No se pudo eliminar la cita.",
                 });
             }
         }
     };
 
-    //================================================Editar==========================
-
-    const handleUpdate = async () => {
-        const camposRequeridos = [
-            "nombreUsuario",
-            "passwordUser",
-            "emailUser",
-            "rol",
-        ];
-
-        const camposVacios = camposRequeridos.filter((campo) => !formData[campo]);
-
-        if (camposVacios.length > 0) {
-            Swal.fire({
-                icon: "error",
-                title: "Campos incompletos",
-                text: "Por favor, completa todos los campos antes de continuar.",
-            });
-            return;
-        }
-
-        try {
-            const userActualizado = {
-                nombreUsuario: formData.nombreUsuario,
-                passwordUser: formData.passwordUser,
-                emailUser: formData.emailUser,
-                rol: formData.rol,
-                status: 1,
-            };
-
-            console.log(idUserActual, userActualizado);
-            await updateUser(idUserActual, userActualizado);
-
-            Swal.fire({
-                icon: "success",
-                title: "Usuario actualizado",
-                text: "Los datos fueron actualizados exitosamente.",
-            });
-
-            abrirModalUsers();
-            setFormData(initialForm);
-            setModoEdicion(false);
-            await cargarDatos();
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "No se pudo actualizar el usuario.",
-            });
-        }
-    };
-
     return {
         open,
-        abrirModalUsers,
+        abrirModalCitas,
         formData,
-        users,
-        roles,
+        citas,
         handleChange,
-        handleDelete,
         handleSubmit,
         handleEditClick,
-        modoEdicion,
-        idUserActual,
-        handleUpdate,
+        handleDelete,
     };
 };

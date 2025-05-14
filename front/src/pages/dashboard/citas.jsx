@@ -1,14 +1,22 @@
 
 import { useCitasLogic } from "@/hooks/citas/useCitasLogic";
 //import citasForm from "@/components/citas/formCitas";
-import citasTable from "@/components/citas/tablaCitas";
+import CitasTable from "@/components/citas/tablaCitas";
 import { Button } from "@material-tailwind/react";
-import { use } from "react";
 
 
 export function Citas() {
     const {
+        open,
+        abrirModalCitas,
+        formData,
         citas,
+        handleChange,
+        modoEdicion,
+        handleUpdate,
+        handleDelete,
+        handleSubmit,
+        handleEditClick,
     } = useCitasLogic();
 
     return (
@@ -18,7 +26,10 @@ export function Citas() {
                     Registrar Cita
                 </Button>
             </div>
-            <citasTable
+
+
+
+            <CitasTable
                 citas={citas}
             />
 
