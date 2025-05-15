@@ -1,13 +1,31 @@
 import Citas from "../../models/citas/citas.js";
+import Medical from "../../models/Medicos/medical.js";
 import { Types } from "mongoose";
 
 const getAll = async (req, res) => {
   try {
-    let listaCita = await Citas.find().populate("medicoId").populate("pacienteId").
-      exec();
+    let listaCita = await Citas.find()
+      .populate("medicoId")
+      .populate("pacienteId")
+      .exec();
     res.status(200).send({
       exito: true,
       listaCita,
+    });
+  } catch (error) {
+    res.status(500).send({
+      exito: false,
+      mensaje: "Error en la consulta",
+    });
+  }
+};
+
+const getMedicos = async (req, res) => {
+  try {
+    let listaMedicos = await Medical.find().exec();
+    res.status(200).send({
+      exito: true,
+      listaMedicos,
     });
   } catch (error) {
     res.status(500).send({
@@ -50,4 +68,5 @@ export const nuevo = async (req, res) => {
 export default {
   getAll,
   nuevo,
+  getMedicos,
 };

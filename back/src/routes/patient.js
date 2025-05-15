@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import multer from "multer";
+import Paciente from "../models/Paciente/patient.js";
 const router = express.Router();
 import {
   getAll,
@@ -8,7 +9,7 @@ import {
   searchById,
   subirImagen,
   deleteById,
-  avatar
+  avatar,
 } from "../controllers/Paciente/patient.js";
 
 import { celebrate, Joi, errors, Segments } from "celebrate";
@@ -40,6 +41,18 @@ router.get("/patient/:id", async (req, res) => {
   }
 });
 
+// Inputt ====================================================================
+router.get("/pacientes", async (req, res) => {
+  try {
+    const nombre = req.query.nombre || "";
+    const pacientes = await Paciente.find({
+      nombrePaciente: { $regex: nombre, $options: "i" },
+    }).limit(10);
+    res.json(pacientes);
+  } catch (error) {
+    res.status(500).json({ error: "Error al buscar pacientes" });
+  }
+});
 
 router.post(
   "/patient/create",
@@ -97,8 +110,8 @@ router.post(
   "/patient/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required()
-    })
+      id: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     try {

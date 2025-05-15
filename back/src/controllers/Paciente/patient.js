@@ -21,8 +21,9 @@ export const getAll = async () => {
 
 export const add = async (data) => {
   const patientExist = await Patients.findOne({ documento: data.documento });
-  const emailExist = await Users.findOne({ email: data.email });
-  const userExist = await Users.findOne({ nombreUsuario: data.nombreUsuario });
+  const emailExist = await Users.findOne({ emailUser: data.emailUser });
+  const userExist = await Users.findOne({ nombreUsuario: data.userName });
+
   if (patientExist) {
     return {
       estado: false,

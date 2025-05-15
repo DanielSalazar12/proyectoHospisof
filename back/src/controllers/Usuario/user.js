@@ -25,7 +25,9 @@ const listarTodos = async (req, res) => {
 
 const nuevo = async (req, res) => {
   try {
-    const emailExist = await Usuarios.findOne({ emailUser: req.body.email });
+    const emailExist = await Usuarios.findOne({
+      emailUser: req.body.emailUser,
+    });
     const userExist = await Usuarios.findOne({
       nombreUsuario: req.body.nombreUsuario,
     });
@@ -47,7 +49,7 @@ const nuevo = async (req, res) => {
     const datos = {
       nombreUsuario: req.body.nombreUsuario,
       passwordUser: req.body.passwordUser,
-      emailUser: req.body.email,
+      emailUser: req.body.emailUser,
       rol: req.body.rol,
       status: req.body.status || 1,
     };

@@ -10,6 +10,7 @@ import {
   deleteById,
   searchById,
 } from "../controllers/Medicos/medical.js";
+import Medical from "../models/Medicos/medical.js";
 
 import { celebrate, Joi, errors } from "celebrate";
 
@@ -120,6 +121,20 @@ router.put(
     }
   }
 );
+// =============================================================================Inputt ===========================================================================================
+
+router.get("/medicos", async (req, res) => {
+  try {
+    const nombre = req.query.nombre || "";
+    const medicos = await Medical.find({
+      nombreMedico: { $regex: nombre, $options: "i" },
+    }).limit(10);
+    res.json(medicos);
+  } catch (error) {
+    res.status(500).json({ error: "Error al buscar medicos" });
+  }
+});
+
 router.post(
   "/medical/delet",
   celebrate({

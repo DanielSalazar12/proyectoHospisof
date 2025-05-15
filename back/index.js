@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { cnx } from "./src/models/db/connection.js";
+
 import medicaments from "./src/routes/medicaments.js";
 import diganostico from "./src/routes/diganostico.js";
 import medical from "./src/routes/medical.js";
