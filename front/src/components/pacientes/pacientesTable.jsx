@@ -83,7 +83,7 @@ export default function PacientesTable({ pacientes, roles, handleDelete, handleE
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.95, rotate: -5 }}
                           className="text-blue-500 hover:text-blue-700"
-                          onClick={() => handleEditClick(paciente._id)} // Llama a handleEditClick para cargar los datos
+                          onClick={() => handleEditClick(paciente._id)}
                         >
                           <PencilIcon className="h-5 w-5" />
                         </motion.button>

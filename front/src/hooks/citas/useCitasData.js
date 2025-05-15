@@ -3,13 +3,24 @@
 import axios from "axios";
 
 export const fetchCitas = async () => {
-    try {
-        const res = await axios.get("http://localhost:3000/api/citas/listartodos");
-        return res.data.listaCita || [];
-    } catch (err) {
-        console.error("Error al cargar citas:", err);
-        return [];
-    }
+  try {
+    const res = await axios.get("http://localhost:3000/api/citas/listartodos");
+    return res.data.listaCita || [];
+  } catch (err) {
+    console.error("Error al cargar citas:", err);
+    return [];
+  }
+};
+export const fetchMedicos = async () => {
+  try {
+    const res = await axios.get(
+      "http://localhost:3000/api/citas/listarMedicos",
+    );
+    return res.data.listaMedicos || [];
+  } catch (err) {
+    console.error("Error al cargar citas:", err);
+    return [];
+  }
 };
 /*
 export const fetchValidacionDelete = async (idUser) => {

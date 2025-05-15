@@ -135,6 +135,7 @@ export function usePacientesLogic() {
       };
 
       const usuarioCreado = await createUser(nuevoUsuario);
+
       if (!usuarioCreado.estado) {
         setOpen(false);
         setFormData(initialForm);
@@ -144,7 +145,7 @@ export function usePacientesLogic() {
         Swal.fire({
           icon: "error",
           title: "Error al registrar usuario",
-          text: resultadoPaciente.mensaje || "No se pudo registrar el usuario.",
+          text: usuarioCreado.mensaje || "No se pudo registrar el usuario.",
         });
         return;
       }

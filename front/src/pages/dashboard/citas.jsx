@@ -10,6 +10,8 @@ export function Citas() {
     const {
         open,
         citas,
+        pacientes,
+        medicos,
         cargarDatos,
         handleEventClick,
         getInitialDate,
@@ -62,6 +64,8 @@ export function Citas() {
                 formData={formData}
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
+                medicos={medicos}
+                pacientes={pacientes}
             />
         </div>
     );

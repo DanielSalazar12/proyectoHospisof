@@ -13,15 +13,18 @@ import {
     CardBody,
 } from "@material-tailwind/react";
 
+import {BuscarPacienteInput} from "../citas/buscarPaciente";
+
 export function ModalCita({
     open,
     onClose,
     formData,
     handleChange,
     handleSubmit,
-    pacientes = [],
-    medicos = [],
+    pacientes,
+    medicos ,
     modoEdicion = false,
+  
 }) {
     return (
         <Dialog open={open} handler={onClose} size="md" className="rounded-t-xl">
@@ -31,18 +34,12 @@ export function ModalCita({
                 </CardHeader>
                 <CardBody>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Select
-                            label="Paciente"
-                            name="pacienteId"
-                            value={formData.pacienteId}
-                            onChange={(val) => handleChange({ target: { name: "pacienteId", value: val } })}
-                        >
-                            {pacientes.map((p) => (
-                                <Option key={p._id} value={p._id}>
-                                    {p.nombrePaciente}
-                                </Option>
-                            ))}
-                        </Select>
+                       <BuscarPacienteInput
+    value={formData.pacienteId}
+    onChange={(val) =>
+        handleChange({ target: { name: "pacienteId", value: val } })
+    }
+/>
 
                         <Select
                             label="Médico"
