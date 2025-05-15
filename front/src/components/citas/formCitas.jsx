@@ -1,69 +1,110 @@
-import { useState } from "react";
-import Swal from "sweetalert2";
+import {
+    Dialog,
+    DialogHeader,
+    DialogBody,
+    DialogFooter,
+    Input,
+    Select,
+    Option,
+    Button,
+    Typography,
+    Card,
+    CardHeader,
+    CardBody,
+} from "@material-tailwind/react";
 
-const ModalCita = ({ open, onClose }) => {
-    const [formData, setFormData] = useState({
-        pacienteId: "",
-        medicoId: "",
-        fechaCita: "",
-        horaCita: "",
-        motivo: "",
-        notas: "",
-        tipoConsulta: "",
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async () => {
-        // Aquí va la lógica para guardar la cita, ya sea llamando a una API
-        Swal.fire({
-            icon: "success",
-            title: "Cita registrada",
-            text: "La cita se ha registrado correctamente.",
-        });
-        onClose(); // Cerrar el modal
-    };
-
-    if (!open) return null;
-
+export function ModalCita({
+    open,
+    onClose,
+    formData,
+    handleChange,
+    handleSubmit,
+    pacientes = [],
+    medicos = [],
+    modoEdicion = false,
+}) {
     return (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg">
-                <h2 className="text-xl font-semibold mb-4">Registrar Cita</h2>
-                <form onSubmit={handleSubmit}>
-                    {/* Agregar campos de formulario aquí */}
-                    <div className="mb-4">
-                        <label htmlFor="pacienteId" className="block">Paciente</label>
-                        <input
-                            type="text"
+        <Dialog open={open} handler={onClose} size="md" className="rounded-t-xl">
+            <Card className="w-full">
+                <CardHeader color="blue" className="m-0 grid place-items-center px-4 py-8 text-center">
+                    {modoEdicion ? "Editar Cita" : "Registrar Nueva Cita"}
+                </CardHeader>
+                <CardBody>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Select
+                            label="Paciente"
                             name="pacienteId"
                             value={formData.pacienteId}
+                            onChange={(val) => handleChange({ target: { name: "pacienteId", value: val } })}
+                        >
+                            {pacientes.map((p) => (
+                                <Option key={p._id} value={p._id}>
+                                    {p.nombrePaciente}
+                                </Option>
+                            ))}
+                        </Select>
+
+                        <Select
+                            label="Médico"
+                            name="medicoId"
+                            value={formData.medicoId}
+                            onChange={(val) => handleChange({ target: { name: "medicoId", value: val } })}
+                        >
+                            {medicos.map((m) => (
+                                <Option key={m._id} value={m._id}>
+                                    {m.nombreMedico}
+                                </Option>
+                            ))}
+                        </Select>
+
+                        <Input
+                            label="Fecha"
+                            type="date"
+                            name="fechaCita"
+                            value={formData.fechaCita}
                             onChange={handleChange}
-                            className="w-full p-2 border border-gray-300 rounded"
-                            required
                         />
-                    </div>
-                    {/* Agregar más campos de formulario... */}
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 bg-gray-300 rounded text-white"
+                        <Input
+                            label="Hora"
+                            type="time"
+                            name="horaCita"
+                            value={formData.horaCita}
+                            onChange={handleChange}
+                        />
+                        <Input
+                            label="Motivo"
+                            name="motivo"
+                            value={formData.motivo}
+                            onChange={handleChange}
+                        />
+                        <Input
+                            label="Notas"
+                            name="notas"
+                            value={formData.notas}
+                            onChange={handleChange}
+                        />
+                        <Select
+                            label="Tipo de Consulta"
+                            name="tipoConsulta"
+                            value={formData.tipoConsulta}
+                            onChange={(val) => handleChange({ target: { name: "tipoConsulta", value: val } })}
                         >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-500 text-white rounded"
-                        >
-                            Registrar
-                        </button>
+                            <Option value="general">General</Option>
+                            <Option value="especialista">Especialista</Option>
+                            <Option value="control">Control</Option>
+                        </Select>
                     </div>
-                </form>
-            </div>
-        </div>
+                </CardBody>
+            </Card>
+
+            <DialogFooter>
+                <Button variant="text" color="red" onClick={onClose} className="mr-2">
+                    Cancelar
+                </Button>
+                <Button onClick={handleSubmit} color="green">
+                    {modoEdicion ? "Actualizar" : "Registrar"}
+                </Button>
+            </DialogFooter>
+        </Dialog>
     );
-};
+}

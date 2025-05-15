@@ -18,13 +18,14 @@ export const useCitasLogic = () => {
     const [citas, setCitas] = useState([]);
     const [formData, setFormData] = useState(initialForm);
 
-    const abrirModalCitas = () => {
-        if (open) {
-            // Si se está cerrando la modal, reseteamos todo
-            setFormData(initialForm);
-        }
-        setOpen(!open);
+    const abrirModal = () => setOpen(true);
+
+    const cerrarModal = () => {
+        console.log("Cerrar modal llamado");
+        setOpen(false);
+        setFormData(initialForm);
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,21 +34,51 @@ export const useCitasLogic = () => {
 
     const cargarDatos = async () => {
         try {
-            const citasData = await fetchCitas(); // Llamada directa a fetchCitas
-            setCitas(citasData); // Asignamos las citas obtenidas a setCitas
+            const citasData = await fetchCitas();
+            setCitas(citasData);
         } catch (error) {
             console.error("Error al cargar citas:", error);
         }
     };
 
-    useEffect(() => {
-        cargarDatos();
-    }, []);
+    const getInitialDate = () => {
+        if (!citas.length) return new Date().toISOString().split("T")[0];
+        const fechas = citas.map((cita) => cita.fechaCita).sort();
+        return fechas[0];
+    };
 
-    // ----------------------------------------------------Insercion -------------------------
-    const handleSubmit = async () => {
+    const handleEventClick = (info) => {
+        const citaId = info.event.extendedProps.id;
+        const citaSeleccionada = citas.find((cita) => cita._id === citaId);
+        if (!citaSeleccionada) return;
+
+        const fechaFormateada = citaSeleccionada.fechaCita.split("T")[0];
+
+        setFormData({
+            pacienteId:
+                citaSeleccionada.pacienteId._id || citaSeleccionada.pacienteId || "",
+            medicoId: citaSeleccionada.medicoId._id || citaSeleccionada.medicoId || "",
+            fechaCita: fechaFormateada,
+            horaCita: citaSeleccionada.horaCita || "",
+            motivo: citaSeleccionada.motivo || "",
+            notas: citaSeleccionada.notas || "",
+            tipoConsulta: citaSeleccionada.tipoConsulta || "",
+            fechaCreacion: citaSeleccionada.fechaCreacion || "",
+        });
+
+        abrirModal();
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         const camposRequeridos = [
-            "pacienteId", "medicoId", "fechaCita", "horaCita", "motivo", "tipoConsulta",
+            "pacienteId",
+            "medicoId",
+            "fechaCita",
+            "horaCita",
+            "motivo",
+            "tipoConsulta",
         ];
 
         const camposVacios = camposRequeridos.filter((campo) => !formData[campo]);
@@ -62,7 +93,7 @@ export const useCitasLogic = () => {
         }
 
         try {
-            // Asegúrate de ajustar esta parte para la creación de una nueva cita.
+            // Aquí podrías diferenciar entre crear o actualizar según formData tenga _id o no
             const nuevaCita = {
                 pacienteId: formData.pacienteId,
                 medicoId: formData.medicoId,
@@ -74,9 +105,8 @@ export const useCitasLogic = () => {
                 fechaCreacion: new Date().toISOString(),
             };
 
-            // Aquí debes realizar la acción de creación, por ejemplo usando una API.
-            // await createCita(nuevaCita); 
-            // Simulamos un éxito para mostrar el mensaje de éxito.
+            // await createCita(nuevaCita); // Descomenta para llamar tu API
+
             Swal.fire({
                 icon: "success",
                 title: "Cita registrada",
@@ -85,8 +115,8 @@ export const useCitasLogic = () => {
             });
 
             setFormData(initialForm);
-            await cargarDatos(); // Recargamos las citas
-
+            cerrarModal();
+            await cargarDatos();
         } catch (error) {
             console.error("Error al registrar cita:", error);
             Swal.fire({
@@ -94,18 +124,6 @@ export const useCitasLogic = () => {
                 title: "Oops...",
                 text: "Ocurrió un error al registrar la cita.",
             });
-        }
-    };
-
-    const handleEditClick = async (id) => {
-        // Aquí se debe manejar la edición de la cita, cargar la cita y permitir su modificación.
-        try {
-            // Ejemplo: const cita = await getCitaById(id);
-            // setFormData({...cita});
-            setOpen(true);
-        } catch (error) {
-            console.error("Error al cargar la cita:", error);
-            Swal.fire("Error", "No se pudo cargar la cita", "error");
         }
     };
 
@@ -121,7 +139,6 @@ export const useCitasLogic = () => {
 
         if (result.isConfirmed) {
             try {
-                // Simulamos la eliminación de la cita, ajusta esto a tu lógica.
                 // await deleteCita(id);
                 await cargarDatos();
                 Swal.fire({
@@ -140,14 +157,21 @@ export const useCitasLogic = () => {
         }
     };
 
+    useEffect(() => {
+        cargarDatos();
+    }, []);
+
     return {
         open,
-        abrirModalCitas,
+        abrirModal,
+        cerrarModal,
         formData,
         citas,
+        cargarDatos,
         handleChange,
+        handleEventClick,
         handleSubmit,
-        handleEditClick,
         handleDelete,
+        getInitialDate,
     };
 };
