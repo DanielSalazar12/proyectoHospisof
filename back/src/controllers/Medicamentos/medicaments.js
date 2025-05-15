@@ -1,5 +1,5 @@
 // controlador medico
-import Medicamentos from "../../models/Medicamentos/medicamentos.js";
+import Medicamentos from "../../models/Medicamentos/medicaments.js";
 // node nativo : fs : filessystem instanciamos para manipular el sistema de archivos del servidor
 import fs from "fs";
 // modulo nativo de node util para manejar las rutas

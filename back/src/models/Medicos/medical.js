@@ -1,43 +1,53 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 const medicalShema = new Schema(
   {
     nombreMedico: {
       type: String,
-      require: true
+      require: true,
     },
     apellidoMedico: {
       type: String,
-      require: true
+      require: true,
     },
     documento: {
       type: Number,
-      require: true
+      require: true,
     },
     emailMedico: {
       type: String,
-      require: true
+      require: true,
     },
     telefono: {
       type: Number,
-      require: true
+      require: true,
     },
     fechaNacimiento: {
       type: String,
-      require: true
+      require: true,
     },
     especialidad: {
       type: String,
-      require: true
+      require: true,
     },
     foto: {
       type: String,
-      require: true
+      require: true,
+    },
+    idRol: {
+      type: Types.ObjectId,
+      ref: "Roles",
+      required: true,
+    },
+    idUsuario: {
+      type: Types.ObjectId,
+      ref: "Usuario",
+      required: true,
     },
     status: {
       type: String,
-      require: true
-    }
+      require: true,
+    },
   },
   { collection: "medicos" }
 );

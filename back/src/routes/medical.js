@@ -29,6 +29,7 @@ const schema = Joi.object({
   telefono: Joi.number().required(),
   email: Joi.string().required(),
   especialidad: Joi.string().required(),
+  rol: Joi.string().required(),
   fechaNacimiento: Joi.string().required(),
 });
 
@@ -43,6 +44,8 @@ router.get("/medical/list/:page/:limit", async (req, res) => {
     res.status(500).json({ message: "Error al obtener la lista de medicos" });
   }
 });
+
+
 router.get("/medical/image/:file", async (req, res) => {
   const { file } = req.params;
   try {
