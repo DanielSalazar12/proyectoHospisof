@@ -73,6 +73,7 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
     formData.append("telefono", formulario.telefono);
     formData.append("email", formulario.email);
     formData.append("especialidad", formulario.especialidad);
+    formData.append("rol", "");
     formData.append("foto", formulario.foto);
     hanlseInsert(formData);
     console.log("Formulario enviado");
@@ -108,9 +109,10 @@ const FormMedico = ({ setRefresh, stateModal, urlApi }) => {
               foto: "",
             });
           } else {
+            stateModal(false);
             Swal.fire({
               title: "Error",
-              text: "No se pudo Registrar el medico",
+              text: response.data.mensaje,
               icon: "error",
               showConfirmButton: false,
             });

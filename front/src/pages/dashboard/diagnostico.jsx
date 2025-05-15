@@ -28,12 +28,12 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { useState, useCallback, useEffect } from "react";
-import { conversationsData } from "@/data";
 import axios from "axios";
 import FormDiagnostico from "@/components/diagnosticos/FormDiagnostico";
 
 const urlApi = "http://127.0.0.1:3000/api/diagnostic/";
 const urlApiPatients = "http://127.0.0.1:3000/api/patient/";
+const urlApiMedicals = "http://127.0.0.1:3000/api/diagnostic/";
 
 export function Diagnostico() {
   const [open, setOpen] = useState(false);
@@ -47,6 +47,7 @@ export function Diagnostico() {
   const [diagnosticos, setDiagnosticos] = useState([]); // Diagnosticos del pacientes
   const [diagnostico, setDiagnostico] = useState(null); // Diagnostico seleccionado para ver la informacion
 
+  const [medicos, setMedicos] = useState([]);
   const [paciente, setPaciente] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [pacienteValido, setPacienteValido] = useState(false);
@@ -76,6 +77,7 @@ export function Diagnostico() {
 
   const validPaciente = () => {
     const patient = pacientes.find((p) => p.documento == busqueda);
+
     if (!patient) {
       Swal.fire({
         title: "Documento Invalido",
@@ -86,33 +88,16 @@ export function Diagnostico() {
       });
       setPacienteValido(false);
       setPaciente([]);
+      setDocumento("");
     } else {
+      console.log(patient.documento);
+      setRefresh(!refresh);
       setPaciente(patient);
       setDocumento(patient.documento);
+      medicosList(patient.documento);
       setPacienteValido(true);
     }
   };
-
-  /*   const handleBusqueda = async (documento) => {
-    try {
-      const response = await axios.get(urlApi + `list/${documento}`);
-      if (
-        response.data &&
-        response.data.data &&
-        Array.isArray(response.data.data)
-      ) {
-        setDiagnosticos(response.data.data);
-      } else {
-        console.log("La respuesta de la API no es la qué se esperaba.");
-        setDiagnosticos([]);
-      }
-    } catch (error) {
-      console.log(
-        "Error al obtener los diagnosticos del paciente: " + error.message,
-      );
-      setDiagnosticos([]);
-    }
-  }; */
   const fetchPacientes = useCallback(async () => {
     try {
       const response = await axios.get(urlApiPatients + "list");
@@ -149,7 +134,6 @@ export function Diagnostico() {
         } else {
           url = `${urlApi}list/${documento}/1/${paginacion.porPagina}`;
           console.log("else ", documento, " ulr", url);
-
         }
         const response = await axios.get(url);
 
@@ -177,8 +161,8 @@ export function Diagnostico() {
                 currentPage < totalPages
                   ? `${urlApi}list/${currentPage + 1}/${limit}`
                   : null,
-              primeraUrl: `${urlApi}list/1/${limit}`,
-              ultimaUrl: `${urlApi}list/${totalPages}/${limit}`,
+              primeraUrl: `${urlApi}list/${documento}/1/${limit}`,
+              ultimaUrl: `${urlApi}list/${documento}/${totalPages}/${limit}`,
             });
           }
         } else {
@@ -201,7 +185,7 @@ export function Diagnostico() {
 
   useEffect(() => {
     fetchPacientes();
-  }, [fetchPacientes, refresh]);
+  }, [fetchPacientes]);
 
   useEffect(() => {
     fetchInitialData();
@@ -269,6 +253,13 @@ export function Diagnostico() {
       </Button>
     </div>
   );
+
+  const medicosList = useCallback(async (documento) => {
+    const response = await axios.get(
+      urlApiMedicals + `infoMedicals/${documento}`,
+    );
+    setMedicos(response.data.data);
+  });
   return (
     <>
       {diagnostico && (
@@ -420,7 +411,6 @@ export function Diagnostico() {
                           value={busqueda}
                           onChange={handleReadInput}
                           icon={<i className="fa-solid fa-user-tie"></i>}
-                          /* onChange={(e) => setBusqueda(e.target.value)} */
                         />
                       </Tooltip>
                     </div>
@@ -460,10 +450,12 @@ export function Diagnostico() {
                       Historial Medicos
                     </Typography>
                     <ul className="flex flex-col gap-6">
-                      {conversationsData.map((props) => (
+                      {medicos.map((medico) => (
                         <MessageCard
-                          key={props.name}
-                          {...props}
+                          key={medico._id}
+                          name={medico.medicalId.nombreMedico}
+                          message={medico.medicalId.especialidad}
+                          img={`http://127.0.0.1:3000/api/medical/image/${medico.medicalId.foto}`}
                           action={
                             <IconButton color="blue" className="rounded-full">
                               <i className="fa-solid fa-info"></i>

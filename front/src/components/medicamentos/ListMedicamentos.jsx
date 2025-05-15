@@ -263,7 +263,7 @@ const ListMedicamentos = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-11">
         {busqueda.length > 0 &&
           busqueda.map((medicamento) => (
-            <Card className="w-96 shadow-lg relative" key={medicamento.codigo}>
+            <Card className="w-96 mt-3 shadow-lg relative" key={medicamento.codigo}>
               <CardHeader
                 floated={false}
                 className="h-60 overflow-hidden relative"
