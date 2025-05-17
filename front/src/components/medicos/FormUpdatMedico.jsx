@@ -24,7 +24,7 @@ export default function FormUpdatMedico({
   const [type, setType] = useState("Informacion");
   const [form, setForm] = useState(dataForm);
   const [imagen, setImagen] = useState(null);
-  const [update, setUpdate] = useState([]);
+
   const [especialidad, setEspecialidad] = useState([]);
 
   const handleChange = (e) => {

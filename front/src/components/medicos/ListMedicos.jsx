@@ -33,7 +33,6 @@ const ListMedicos = ({
   onRefresh,
 }) => {
   const [detalles, setdetalles] = useState(null);
-  const [update, setUpdate] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const busqueda = medicos.filter((medico) =>
@@ -237,7 +236,6 @@ const ListMedicos = ({
             />
           </div>
         </div>
-        
       </div>
       {loading && <Typography>Cargando medicos...</Typography>}
       {error && <Typography color="red">{error}</Typography>}
@@ -395,25 +393,6 @@ const ListMedicos = ({
                       </div>
                     </div>
                   </div>
-                  {/* Código de barras */}
-                  {/*    <div className="flex justify-end mt-4">
-                    <div className="w-28 h-6 bg-gray-200 flex items-center justify-center">
-                      <svg width="100%" height="100%" viewBox="0 0 90 24">
-                        <rect x="2" y="2" width="4" height="20" fill="#222" />
-                        <rect x="10" y="2" width="2" height="20" fill="#222" />
-                        <rect x="16" y="2" width="6" height="20" fill="#222" />
-                        <rect x="26" y="2" width="2" height="20" fill="#222" />
-                        <rect x="32" y="2" width="8" height="20" fill="#222" />
-                        <rect x="44" y="2" width="2" height="20" fill="#222" />
-                        <rect x="50" y="2" width="4" height="20" fill="#222" />
-                        <rect x="58" y="2" width="2" height="20" fill="#222" />
-                        <rect x="64" y="2" width="6" height="20" fill="#222" />
-                        <rect x="74" y="2" width="2" height="20" fill="#222" />
-                        <rect x="80" y="2" width="8" height="20" fill="#222" />
-                        <rect x="92" y="2" width="2" height="20" fill="#222" />
-                      </svg>
-                    </div>
-                  </div> */}
                 </div>
               </CardBody>
             </Card>

@@ -7,10 +7,11 @@ import {
   Button,
   Card,
 } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
-import { useFormMedicamento } from "@/hooks/useFormMedicamento";
+import { useState, useCallback } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
-const FormMedicamento = ({ activeStep }) => {
+const FormMedicamento = ({ activeStep, setRefresh, stateModal, urlApi }) => {
   const [formulario, setFormData] = useState({
     nombre: "",
     administracion: "",
@@ -27,8 +28,6 @@ const FormMedicamento = ({ activeStep }) => {
     vencimiento: "",
   });
   const [imagen, setImagen] = useState(null);
-
-  const [medicamentoCreado, setMedicamentoCreado] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,15 +65,6 @@ const FormMedicamento = ({ activeStep }) => {
     )}-${formulario.formaFarma.substring(0, 3).toUpperCase()}`;
   };
 
-  const { medicamento } = useFormMedicamento(medicamentoCreado);
-
-  useEffect(() => {
-    if (medicamento) {
-      setFormData({});
-      setImagen(null);
-    }
-  }, [medicamento]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -93,10 +83,62 @@ const FormMedicamento = ({ activeStep }) => {
     formData.append("prCompra", formulario.prCompra);
     formData.append("prVenta", formulario.prVenta);
     formData.append("img", formulario.img);
-    setMedicamentoCreado(formData);
+    hadleInsert(formData);
     console.log("Formulario enviado");
   };
+  const hadleInsert = useCallback(
+    async (data) => {
+      if (typeof data === "object") {
+        try {
+          const response = await axios.post(urlApi + "create/", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
 
+          if (response.data.estado === true) {
+            setRefresh(true);
+            stateModal(false);
+            Swal.fire({
+              title: "Registrado",
+              text: response.data.mensaje,
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1700,
+            });
+            setFormData({
+              nombre: "",
+              administracion: "",
+              img: "",
+              presentacion: "",
+              medida: "",
+              formaFarma: "",
+              descripcion: "",
+              concentracion: "",
+              envase: "",
+              prCompra: 0,
+              prVenta: 0,
+              stock: 0,
+              vencimiento: "",
+            });
+          } else {
+            Swal.fire({
+              title: "Error",
+              text: "No se pudo Registrar el medico",
+              icon: "error",
+              showConfirmButton: false,
+            });
+          }
+        } catch (error) {
+          Swal.fire("Error", "Ocurrió un problema", "error");
+          console.error("Update error:", error);
+        }
+      } else {
+        console.log("No es un Object :", data);
+      }
+    },
+    [setRefresh, urlApi],
+  );
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -140,6 +182,7 @@ const FormMedicamento = ({ activeStep }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="administracion"
                   value={formulario.administracion}
+                  required
                   onChange={(option) =>
                     handleSelectChange("administracion", option)
                   }
@@ -176,6 +219,7 @@ const FormMedicamento = ({ activeStep }) => {
                   placeholder="1"
                   name="presentacion"
                   value={formulario.presentacion}
+                  required
                   onChange={(option) =>
                     handleSelectChange("presentacion", option)
                   }
@@ -216,6 +260,7 @@ const FormMedicamento = ({ activeStep }) => {
                   name="medida"
                   value={formulario.medida}
                   onChange={(option) => handleSelectChange("medida", option)}
+                  required
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 bg-white text-gray-800 focus:!border-primary"
                 >
                   {/* Unidades de masa */}
@@ -254,6 +299,7 @@ const FormMedicamento = ({ activeStep }) => {
                 <Select
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   name="formaFarma"
+                  required
                   value={formulario.formaFarma}
                   onChange={(option) =>
                     handleSelectChange("formaFarma", option)
@@ -300,6 +346,7 @@ const FormMedicamento = ({ activeStep }) => {
                   size="lg"
                   placeholder="eg. Tablestas | Capsulas"
                   name="descripcion"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                   value={formulario.descripcion}
                   onChange={handleChange}
@@ -328,6 +375,7 @@ const FormMedicamento = ({ activeStep }) => {
                 <Input
                   color="gray"
                   size="lg"
+                  required
                   placeholder="eg. <8.8oz | 250g"
                   name="concentracion"
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
@@ -347,6 +395,7 @@ const FormMedicamento = ({ activeStep }) => {
                   className="!w-full !border-[1.5px] !border-blue-gray-200/90 !border-t-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-dark-600 focus:!border-primary focus:!border-t-blue-gray-900 group-hover:!border-primary"
                   placeholder="1"
                   name="envase"
+                  required
                   value={formulario.envase}
                   onChange={(option) => handleSelectChange("envase", option)}
                 >
@@ -384,6 +433,8 @@ const FormMedicamento = ({ activeStep }) => {
                   name="prCompra"
                   value={formulario.prCompra}
                   onChange={handleChange}
+                  requireds
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -404,6 +455,7 @@ const FormMedicamento = ({ activeStep }) => {
                   value={formulario.prVenta}
                   onChange={handleChange}
                   type="number"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -425,6 +477,7 @@ const FormMedicamento = ({ activeStep }) => {
                   name="stock"
                   value={formulario.stock}
                   onChange={handleChange}
+                  required
                   icon={<i className="fa-solid fa-box text-gray-500" />}
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
@@ -446,6 +499,7 @@ const FormMedicamento = ({ activeStep }) => {
                   value={formulario.vencimiento}
                   onChange={handleChange}
                   type="date"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900"
                 />
               </div>
@@ -467,6 +521,7 @@ const FormMedicamento = ({ activeStep }) => {
                   type="file"
                   name="img"
                   accept="image/.png, image/jpeg, image/jpg"
+                  required
                   className="placeholder:opacity-100 focus:!border-t-gray-900  "
                   icon={<i className="fa-solid fa-image text-gray-500" />}
                   onChange={handleImageChange}

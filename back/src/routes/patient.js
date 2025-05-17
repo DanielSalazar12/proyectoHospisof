@@ -1,5 +1,5 @@
 import express, { json } from "express";
-
+import multer from "multer";
 const router = express.Router();
 import {
   getAll,
@@ -29,15 +29,17 @@ router.get("/patient/img/", async (req, res) => {
     res.status(500).json({ message: "Error al obtener la imagen" });
   }
 });
+
 router.get("/patient/:id", async (req, res) => {
   try {
     const data = req.params.id;
-    const response = await searchById(data);
+    const response = await searchById({ id: data });
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener la informacion" });
+    res.status(500).json({ message: "Error al obtener la información" });
   }
 });
+
 
 router.post(
   "/patient/create",
@@ -46,10 +48,13 @@ router.post(
       nombre: Joi.string().required(),
       fecha: Joi.date().required(),
       documento: Joi.number().required(),
-      email: Joi.string().required(),
       telefono: Joi.number().required(),
-      eps: Joi.string().required()
-    })
+      eps: Joi.string().required(),
+      idUsuario: Joi.string().hex().length(24).required(),
+      estadoCivil: Joi.string().required(),
+      sexo: Joi.string().required(),
+      direccion: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     try {
@@ -61,6 +66,7 @@ router.post(
     }
   }
 );
+
 router.post(
   "/patient/update",
   celebrate({
@@ -69,10 +75,12 @@ router.post(
       nombre: Joi.string().required(),
       fecha: Joi.date().required(),
       documento: Joi.number().required(),
-      email: Joi.string().required(),
+      eps: Joi.string().required(),
       telefono: Joi.number().required(),
-      eps: Joi.string().required()
-    })
+      estadoCivil: Joi.string().required(),
+      sexo: Joi.string().required(),
+      direccion: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     try {

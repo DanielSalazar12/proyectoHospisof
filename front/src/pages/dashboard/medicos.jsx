@@ -30,8 +30,6 @@ export function Medicos() {
     primeraUrl: `${urlApi}list/1/6`,
     ultimaUrl: null,
   });
-  /*   console.log(medicos);
-  console.log(paginacion); */
   const handleOpen = () => setOpen(!open);
 
   const handlePageChange = useCallback(
@@ -106,7 +104,12 @@ export function Medicos() {
         </Button>
       </Tooltip>
 
-      <Dialog open={open} handler={handleOpen} size="md">
+      <Dialog
+        open={open}
+        handler={handleOpen}
+        size="md"
+        className="rounded-t-lg"
+      >
         <DialogHeader className="flex items-center bg-gradient-to-r from-blue-600 to-blue-400 rounded-t-lg px-6 py-4 justify-center text-white">
           {" "}
           <div className="flex flex-col items-center">

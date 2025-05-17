@@ -4,9 +4,11 @@ const router = express.Router();
 import {
   getAll,
   add,
-  updateMedicament,  searchById,
+  updateMedicament,
+  searchById,
+  getList,
   deleteById,
-} from "../controllers/Medicamentos/medicamentos.js";
+} from "../controllers/Medicamentos/medicaments.js";
 import path from "path";
 import fs from "fs";
 import { celebrate, Joi, errors, Segments } from "celebrate";
@@ -41,9 +43,11 @@ const schema = Joi.object({
 });
 
 const uploads = multer({ storage });
-router.get("/medicamentos/list", async (req, res) => {
+router.get("/medicaments/list/:page/:limit", async (req, res) => {
   try {
-    const response = await getAll();
+    const page = parseInt(req.params.page || 1);
+    const limit = parseInt(req.params.limit || 10);
+    const response = await getAll(limit, page);
     res.status(200).json(response);
   } catch (error) {
     res
@@ -51,7 +55,17 @@ router.get("/medicamentos/list", async (req, res) => {
       .json({ message: "Error al obtener la lista de medicamentos" });
   }
 });
-router.get("/medicamentos/image/:file", async (req, res) => {
+router.get("/medicaments/info", async (req, res) => {
+  try {
+    const response = await getList();
+    res.status(200).json(response);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error al obtener la lista de medicamentos" });
+  }
+});
+router.get("/medicaments/image/:file", async (req, res) => {
   const { file } = req.params;
   try {
     const filepath = path.resolve("./src/uploads/medicamentos", file);
@@ -70,7 +84,7 @@ router.get("/medicamentos/image/:file", async (req, res) => {
     res.status(500).json({ message: "Error al obtener la imagen" });
   }
 });
-router.get("/medicamentos/:id", async (req, res) => {
+router.get("/medicaments/:id", async (req, res) => {
   try {
     const data = req.params.id;
     const response = await searchById(data);
@@ -80,7 +94,7 @@ router.get("/medicamentos/:id", async (req, res) => {
   }
 });
 router.post(
-  "/medicamentos/create",
+  "/medicaments/create",
   uploads.single("img"),
   celebrate({
     body: schema,
@@ -97,17 +111,15 @@ router.post(
       const response = await add(data, file);
       res.status(200).json(response);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: `Error al Registrar el Medicamento`,
-          error: `${error}`,
-        });
+      res.status(500).json({
+        message: `Error al Registrar el Medicamento`,
+        error: `${error}`,
+      });
     }
   }
 );
 router.put(
-  "/medicamentos/update/:id",
+  "/medicaments/update/:id",
   uploads.single("img"),
   celebrate({
     body: schema,
@@ -131,7 +143,7 @@ router.put(
   }
 );
 router.post(
-  "/medicamentos/delet",
+  "/medicaments/delet",
   celebrate({
     body: Joi.object({
       id: Joi.string().required(),

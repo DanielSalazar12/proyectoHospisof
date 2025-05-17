@@ -8,7 +8,7 @@ import {
   add,
   updateMedical,
   deleteById,
-  searchById
+  searchById,
 } from "../controllers/Medicos/medical.js";
 
 import { celebrate, Joi, errors } from "celebrate";
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
-  }
+  },
 });
 const schema = Joi.object({
   nombre: Joi.string().required(),
@@ -29,7 +29,8 @@ const schema = Joi.object({
   telefono: Joi.number().required(),
   email: Joi.string().required(),
   especialidad: Joi.string().required(),
-  fechaNacimiento: Joi.string().required()
+  rol: Joi.string().required(),
+  fechaNacimiento: Joi.string().required(),
 });
 
 const uploads = multer({ storage });
@@ -37,13 +38,14 @@ router.get("/medical/list/:page/:limit", async (req, res) => {
   try {
     const page = parseInt(req.params.page || 1);
     const limit = parseInt(req.params.limit || 10);
-
     const response = await getAll(limit, page);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la lista de medicos" });
   }
 });
+
+
 router.get("/medical/image/:file", async (req, res) => {
   const { file } = req.params;
   try {
@@ -53,7 +55,7 @@ router.get("/medical/image/:file", async (req, res) => {
       if (err || !stats.isFile()) {
         return res.status(404).json({
           status: false,
-          message: `No existe la imagen: ${file}`
+          message: `No existe la imagen: ${file}`,
         });
       }
 
@@ -76,21 +78,23 @@ router.post(
   "/medical/create",
   uploads.single("foto"),
   celebrate({
-    body: schema
+    body: schema,
   }),
   async (req, res) => {
     try {
       const { body: data } = req;
       const file = req.file;
       if (!file) {
-        return res.status(400).json({ message: "No se ha subido ninguna imagen" });
+        return res
+          .status(400)
+          .json({ message: "No se ha subido ninguna imagen" });
       }
       const response = await add(data, file);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({
         message: `Error al Registrar el Medicamento`,
-        error: `${error}`
+        error: `${error}`,
       });
     }
   }
@@ -99,7 +103,7 @@ router.put(
   "/medical/update/:id",
   uploads.single("foto"),
   celebrate({
-    body: schema
+    body: schema,
   }),
   async (req, res) => {
     try {
@@ -108,7 +112,9 @@ router.put(
       const id = req.params.id;
 
       if (!file) {
-        return res.status(400).json({ message: "No se ha subido ninguna imagen" });
+        return res
+          .status(400)
+          .json({ message: "No se ha subido ninguna imagen" });
       }
       const response = await updateMedical(data, file, id);
       res.status(200).json(response);
@@ -121,8 +127,8 @@ router.post(
   "/medical/delet",
   celebrate({
     body: Joi.object({
-      id: Joi.string().required()
-    })
+      id: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     try {

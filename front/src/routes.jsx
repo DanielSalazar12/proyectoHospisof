@@ -7,13 +7,17 @@ import {
   RectangleStackIcon,
   HeartIcon,
   ClipboardIcon,
+  UserIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/solid";
 
 import {
   Home,
-  Profile,
   Medicamentos,
   Medicos,
+  Diagnostico,
+  Users,
+  Tables,
 } from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
@@ -34,10 +38,22 @@ export const routes = [
         element: <Home />,
       },
       {
+        icon: <UserIcon {...icon} />,
+        name: "Usuarios",
+        path: "/usuarios",
+        element: <Users />,
+      },
+      {
+        icon: <UserGroupIcon {...icon} />,
+        name: "Pacientes",
+        path: "/pacientes",
+        element: <Tables />,
+      },
+      {
         icon: <UserCircleIcon {...icon} />,
         name: "diagnostico",
         path: "/diagnostico",
-        element: <Profile />,
+        element: <Diagnostico />,
       },
       {
         icon: <TableCellsIcon {...icon} />,

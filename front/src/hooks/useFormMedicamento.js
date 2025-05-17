@@ -8,7 +8,7 @@ export const useFormMedicamento = (data = null) => {
     if (data) {
       axios({
         method: "POST",
-        url: "http://127.0.0.1:3000/api/medicamentos/create",
+        url: "http://127.0.0.1:3000/api/medicaments/create",
         data: data,
       })
         .then((response) => {
