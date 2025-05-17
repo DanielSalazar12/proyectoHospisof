@@ -18,6 +18,7 @@ import {
   Diagnostico,
   Users,
   Tables,
+  Citas,
 } from "@/pages/dashboard"; //importamos los componentes de las paginas
 
 import { SignIn, SignUp } from "@/pages/auth";
@@ -48,6 +49,12 @@ export const routes = [
         name: "Pacientes",
         path: "/pacientes",
         element: <Tables />,
+      },
+      {
+        icon: <UserGroupIcon {...icon} />,
+        name: "Agenda de citas",
+        path: "/citas",
+        element: <Citas />,
       },
       {
         icon: <UserCircleIcon {...icon} />,

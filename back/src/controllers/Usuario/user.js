@@ -1,6 +1,9 @@
 import Usuarios from "../../models/Usuario/user.js";
+import Patient from "../../models/Paciente/patient.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+
+import mongoose from "mongoose";
 
 // Funciones de la librería
 
@@ -21,15 +24,36 @@ const listarTodos = async (req, res) => {
 };
 
 const nuevo = async (req, res) => {
-  let datos = {
-    nombreUsuario: req.body.nombreUsuario,
-    passwordUser: req.body.passwordUser,
-    emailUser: req.body.emailUser,
-    rol: req.body.rol,
-    status: req.body.status || 1,
-  };
-
   try {
+    const emailExist = await Usuarios.findOne({
+      emailUser: req.body.emailUser,
+    });
+    const userExist = await Usuarios.findOne({
+      nombreUsuario: req.body.nombreUsuario,
+    });
+
+    if (userExist) {
+      return res.send({
+        estado: false,
+        mensaje: "El nombre de usuario ya existe en el sistema",
+      });
+    }
+
+    if (emailExist) {
+      return res.send({
+        estado: false,
+        mensaje: "El correo electrónico ya existe en el sistema",
+      });
+    }
+
+    const datos = {
+      nombreUsuario: req.body.nombreUsuario,
+      passwordUser: req.body.passwordUser,
+      emailUser: req.body.emailUser,
+      rol: req.body.rol,
+      status: req.body.status || 1,
+    };
+
     const usuarioNuevo = new Usuarios(datos);
     await usuarioNuevo.save();
 
@@ -41,11 +65,10 @@ const nuevo = async (req, res) => {
   } catch (error) {
     return res.send({
       estado: false,
-      mensaje: `Ha ocurrido un error en la consulta: ${error}`,
+      mensaje: `Ha ocurrido un error en la consulta: ${error.message}`,
     });
   }
 };
-
 
 const buscarPorId = async (req, res) => {
   let id = req.params.id;
@@ -64,6 +87,39 @@ const buscarPorId = async (req, res) => {
     return res.send({
       estado: false,
       mensaje: `Error, no se pudo realizar la consulta`,
+    });
+  }
+};
+
+const buscarPorIdUser = async (req, res) => {
+  const idUsuario = req.params.id;
+
+  try {
+    const usuarioId = new mongoose.Types.ObjectId(idUsuario);
+
+    const pacienteRelacionado = await Patient.findOne({
+      idUsuario: usuarioId,
+    }).exec();
+
+    if (pacienteRelacionado) {
+      return res.send({
+        estado: true,
+        relacionado: true,
+        mensaje: "El usuario está relacionado con un paciente.",
+        paciente: pacienteRelacionado,
+      });
+    } else {
+      return res.send({
+        estado: true,
+        relacionado: false,
+        mensaje: "El usuario no está relacionado con ningún paciente.",
+      });
+    }
+  } catch (error) {
+    console.error("Error en la verificación:", error);
+    return res.status(500).send({
+      estado: false,
+      mensaje: "Error al verificar la relación con paciente.",
     });
   }
 };
@@ -125,4 +181,5 @@ export default {
   buscarPorId,
   actualizarPorId,
   eliminarPorId,
+  buscarPorIdUser,
 };
